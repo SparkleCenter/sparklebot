@@ -15,6 +15,16 @@
   Built on <a href="https://github.com/NousResearch/hermes-agent">Hermes Agent</a> by Nous Research (MIT licence)
 </p>
 
+<p align="center">
+  <img src="brand/characters/spark.svg" alt="Spark" width="104">
+  <img src="brand/characters/scout.svg" alt="Scout" width="104">
+  <img src="brand/characters/social.svg" alt="Social" width="104">
+  <img src="brand/characters/events.svg" alt="Events" width="104">
+  <img src="brand/characters/newbot.svg" alt="A new bot" width="104">
+</p>
+<p align="center"><sub><b>Meet the Sparks.</b> Spark runs your day. Scout researches. Social writes. Events looks after
+your community. And a new one wakes up for every job you add.</sub></p>
+
 ---
 
 ## Why we made it

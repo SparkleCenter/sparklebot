@@ -1,10 +1,32 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Spark"><title>Spark</title>
-  <path d="M128 10 Q136 6 133 16 L114 80 L160 80 Q174 81 165 93 L80 188 Q70 197 73 185 L92 120 L44 120 Q30 119 39 107 Z" fill="#F39200" stroke="#B86E00" stroke-width="5" stroke-linejoin="round"/>
-  <g class="face">
-    <ellipse cx="86" cy="96" rx="11" ry="13" fill="#FFFDF9" stroke="#3A2615" stroke-width="3"/>
-    <ellipse cx="118" cy="96" rx="11" ry="13" fill="#FFFDF9" stroke="#3A2615" stroke-width="3"/>
-    <circle class="pupil" cx="89" cy="99" r="5" fill="#3A2615"/>
-    <circle class="pupil" cx="121" cy="99" r="5" fill="#3A2615"/>
-    <path d="M 104 90 q -8 16 0 20 q 4 2 8 -2 M 90 124 q 12 8 24 -2" fill="none" stroke="#3A2615" stroke-width="3" stroke-linecap="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Spark">
+<title>Spark, the main Sparklebot assistant</title>
+<defs><filter id="ink" x="-15%" y="-15%" width="130%" height="130%"><feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="2" seed="7"/><feDisplacementMap in="SourceGraphic" scale="2.8"/></filter></defs>
+<style>
+.blink{animation:blink 4.6s infinite;transform-box:fill-box;transform-origin:center}
+@keyframes blink{0%,91%,100%{transform:scaleY(1)}94%{transform:scaleY(.08)}97%{transform:scaleY(1)}}
+.bob{animation:bob 2.8s ease-in-out infinite;transform-origin:100px 186px}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-7px) rotate(3deg)}}
+.look{animation:look 7s ease-in-out infinite}
+@keyframes look{0%,35%{transform:translate(0,0)}45%,70%{transform:translate(-5px,2px)}80%,100%{transform:translate(1px,-1px)}}
+.tick{animation:flick 1.5s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+.t2{animation-delay:.5s}.t3{animation-delay:1s}
+@keyframes flick{0%,100%{opacity:.2;transform:scale(.6)}50%{opacity:1;transform:scale(1.15)}}
+@media (prefers-reduced-motion: reduce){*{animation:none!important}}
+</style>
+<g stroke="#F39200" stroke-width="5" stroke-linecap="round">
+  <path class="tick" d="M150 34 l11 -9"/>
+  <path class="tick t2" d="M161 54 l15 -1"/>
+  <path class="tick t3" d="M141 16 l3 -12"/>
+</g>
+<g class="bob">
+  <path transform="translate(6 5)" fill="#F39200" d="M127 12 C134 6 138 12 134 20 L117 79 C138 78 152 79 161 81 C172 84 170 92 163 98 L83 186 C75 194 68 190 72 181 L91 122 C74 122 58 121 45 120 C33 118 33 111 40 104 Z"/>
+  <path fill="none" stroke="#2A1F16" stroke-width="3.4" stroke-linejoin="round" filter="url(#ink)" d="M127 12 C134 6 138 12 134 20 L117 79 C138 78 152 79 161 81 C172 84 170 92 163 98 L83 186 C75 194 68 190 72 181 L91 122 C74 122 58 121 45 120 C33 118 33 111 40 104 Z"/>
+  <g filter="url(#ink)">
+    <g class="blink"><ellipse cx="86" cy="98" rx="10" ry="12" fill="#FFFDF8" stroke="#2A1F16" stroke-width="3"/><ellipse cx="119" cy="95" rx="12.5" ry="14.5" fill="#FFFDF8" stroke="#2A1F16" stroke-width="3"/></g>
+    <g class="look"><circle cx="90" cy="100" r="4.6" fill="#2A1F16"/><circle cx="124" cy="97" r="5.4" fill="#2A1F16"/></g>
+    <path d="M74 80 q9 -9 21 -4 q8 4 7 15 q-2 13 -6 19 q-2 5 4 6 q5 0 8 -4" fill="none" stroke="#2A1F16" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M110 80 q8 -7 20 -3" fill="none" stroke="#2A1F16" stroke-width="2.8" stroke-linecap="round"/>
+    <path d="M92 132 q11 7 25 -5" fill="none" stroke="#2A1F16" stroke-width="3" stroke-linecap="round"/>
   </g>
+</g>
 </svg>

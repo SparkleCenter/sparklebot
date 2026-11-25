@@ -1,10 +1,43 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Events"><title>Events</title>
-  <polygon points="100.0,12.0 118.1,32.4 144.0,23.8 149.5,50.5 176.2,56.0 167.6,81.9 188.0,100.0 167.6,118.1 176.2,144.0 149.5,149.5 144.0,176.2 118.1,167.6 100.0,188.0 81.9,167.6 56.0,176.2 50.5,149.5 23.8,144.0 32.4,118.1 12.0,100.0 32.4,81.9 23.8,56.0 50.5,50.5 56.0,23.8 81.9,32.4 " fill="#FFCB3D" stroke="#C08A0C" stroke-width="5" stroke-linejoin="round"/>
-  <g class="face">
-    <ellipse cx="78" cy="88" rx="11" ry="13" fill="#FFFDF9" stroke="#3A2615" stroke-width="3"/>
-    <ellipse cx="124" cy="88" rx="11" ry="13" fill="#FFFDF9" stroke="#3A2615" stroke-width="3"/>
-    <circle class="pupil" cx="81" cy="91" r="5" fill="#3A2615"/>
-    <circle class="pupil" cx="127" cy="91" r="5" fill="#3A2615"/>
-    <path d="M 103 82 q -8 16 0 20 q 4 2 8 -2 M 82 120 q 20 14 40 -2" fill="none" stroke="#3A2615" stroke-width="3" stroke-linecap="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 200 200" role="img" aria-label="Events">
+<title>Events, the community assistant</title>
+<defs>
+<filter id="ink" x="-15%" y="-15%" width="130%" height="130%"><feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="2" seed="31"/><feDisplacementMap in="SourceGraphic" scale="2.8"/></filter>
+<g id="petals">
+  <ellipse cx="100" cy="40" rx="15" ry="27"/><ellipse cx="100" cy="40" rx="15" ry="27" transform="rotate(32.7 100 100)"/>
+  <ellipse cx="100" cy="40" rx="15" ry="27" transform="rotate(65.5 100 100)"/><ellipse cx="100" cy="40" rx="15" ry="27" transform="rotate(98.2 100 100)"/>
+  <ellipse cx="100" cy="40" rx="15" ry="27" transform="rotate(130.9 100 100)"/><ellipse cx="100" cy="40" rx="15" ry="27" transform="rotate(163.6 100 100)"/>
+  <ellipse cx="100" cy="40" rx="15" ry="27" transform="rotate(196.4 100 100)"/><ellipse cx="100" cy="40" rx="15" ry="27" transform="rotate(229.1 100 100)"/>
+  <ellipse cx="100" cy="40" rx="15" ry="27" transform="rotate(261.8 100 100)"/><ellipse cx="100" cy="40" rx="15" ry="27" transform="rotate(294.5 100 100)"/>
+  <ellipse cx="100" cy="40" rx="15" ry="27" transform="rotate(327.3 100 100)"/>
+</g>
+</defs>
+<style>
+.spin{animation:spin 26s linear infinite;transform-origin:100px 100px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.joy{animation:joy 2.2s ease-in-out infinite;transform-origin:100px 100px}
+@keyframes joy{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+.c{animation:tw 2s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+.c2{animation-delay:.6s}.c3{animation-delay:1.2s}
+@keyframes tw{0%,100%{opacity:.15;transform:rotate(0) scale(.7)}50%{opacity:1;transform:rotate(40deg) scale(1.1)}}
+.squint{animation:sq 4.4s infinite;transform-box:fill-box;transform-origin:center}
+@keyframes sq{0%,88%,100%{transform:scaleY(1)}93%{transform:scaleY(1.5) translateY(-1px)}}
+@media (prefers-reduced-motion: reduce){*{animation:none!important}}
+</style>
+<rect class="c" x="16" y="28" width="10" height="5" rx="1.5" fill="#F07258"/>
+<rect class="c c2" x="172" y="152" width="10" height="5" rx="1.5" fill="#F39200"/>
+<rect class="c c3" x="170" y="30" width="6" height="10" rx="1.5" fill="#7FB3A8"/>
+<g class="spin">
+  <use href="#petals" xlink:href="#petals" fill="#FFC93C" transform="translate(4 4)"/>
+  <use href="#petals" xlink:href="#petals" fill="none" stroke="#2A1F16" stroke-width="3" filter="url(#ink)"/>
+</g>
+<g class="joy">
+  <circle cx="104" cy="104" r="46" fill="#F5A524"/>
+  <circle cx="100" cy="100" r="46" fill="none" stroke="#2A1F16" stroke-width="3.4" filter="url(#ink)"/>
+  <ellipse cx="70" cy="112" rx="8" ry="5" fill="#E8603C" opacity=".4"/><ellipse cx="132" cy="110" rx="8" ry="5" fill="#E8603C" opacity=".4"/>
+  <g filter="url(#ink)" fill="none" stroke="#2A1F16" stroke-width="3.2" stroke-linecap="round">
+    <path class="squint" d="M70 94 q9 -11 18 0"/><path class="squint" d="M110 92 q9 -11 18 0"/>
+    <path d="M97 92 q-5 12 1 17 q4 2 8 -1" stroke-width="2.8"/>
+    <path d="M76 116 q24 24 48 -2" stroke-width="3.4"/>
   </g>
+</g>
 </svg>

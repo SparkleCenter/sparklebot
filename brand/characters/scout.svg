@@ -1,10 +1,27 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Scout"><title>Scout</title>
-  <path d="M100 18 Q108 18 113 27 L182 160 Q187 172 174 174 L26 174 Q13 172 18 160 L87 27 Q92 18 100 18 Z" fill="#F5B83D" stroke="#B27A12" stroke-width="5" stroke-linejoin="round"/>
-  <g class="face">
-    <ellipse cx="72" cy="104" rx="11" ry="13" fill="#FFFDF9" stroke="#3A2615" stroke-width="3"/>
-    <ellipse cx="118" cy="104" rx="11" ry="13" fill="#FFFDF9" stroke="#3A2615" stroke-width="3"/>
-    <circle class="pupil" cx="75" cy="107" r="5" fill="#3A2615"/>
-    <circle class="pupil" cx="121" cy="107" r="5" fill="#3A2615"/>
-    <path d="M 97 98 q -9 18 0 22 q 4 2 9 -2 M 74 134 q 14 10 30 -2" fill="none" stroke="#3A2615" stroke-width="3" stroke-linecap="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Scout">
+<title>Scout, the research assistant</title>
+<defs><filter id="ink" x="-15%" y="-15%" width="130%" height="130%"><feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="2" seed="11"/><feDisplacementMap in="SourceGraphic" scale="2.8"/></filter></defs>
+<style>
+.blink{animation:blink 5.3s infinite;transform-box:fill-box;transform-origin:center}
+@keyframes blink{0%,91%,100%{transform:scaleY(1)}94%{transform:scaleY(.08)}97%{transform:scaleY(1)}}
+.scan{animation:scan 5s ease-in-out infinite}
+@keyframes scan{0%,15%{transform:translate(-5px,-2px)}35%,55%{transform:translate(6px,-3px)}70%,100%{transform:translate(-5px,-2px)}}
+.ant{animation:wig 3.2s ease-in-out infinite;transform-origin:99px 26px}
+@keyframes wig{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(10deg)}}
+.lean{animation:lean 5s ease-in-out infinite;transform-origin:100px 176px}
+@keyframes lean{0%,15%{transform:rotate(-2deg)}35%,55%{transform:rotate(2.5deg)}70%,100%{transform:rotate(-2deg)}}
+@media (prefers-reduced-motion: reduce){*{animation:none!important}}
+</style>
+<g class="lean">
+  <g class="ant" filter="url(#ink)"><path d="M99 26 C101 16 106 9 113 4" fill="none" stroke="#2A1F16" stroke-width="3" stroke-linecap="round"/><circle cx="114" cy="5" r="5.5" fill="#F07258" stroke="#2A1F16" stroke-width="2.6"/></g>
+  <path transform="translate(-6 5)" fill="#F2B33D" d="M98 24 C104 17 112 19 116 27 L179 152 C185 166 177 175 162 174 L41 176 C24 177 17 166 24 152 L86 31 C89 26 93 23 98 24 Z"/>
+  <path fill="none" stroke="#2A1F16" stroke-width="3.4" stroke-linejoin="round" filter="url(#ink)" d="M98 24 C104 17 112 19 116 27 L179 152 C185 166 177 175 162 174 L41 176 C24 177 17 166 24 152 L86 31 C89 26 93 23 98 24 Z"/>
+  <g filter="url(#ink)">
+    <g class="blink"><ellipse cx="82" cy="114" rx="14.5" ry="15.5" fill="#FFFDF8" stroke="#2A1F16" stroke-width="3"/><ellipse cx="120" cy="112" rx="9.5" ry="10.5" fill="#FFFDF8" stroke="#2A1F16" stroke-width="3"/></g>
+    <g class="scan"><circle cx="84" cy="114" r="6" fill="#2A1F16"/><circle cx="121" cy="112" r="4.2" fill="#2A1F16"/></g>
+    <path d="M66 94 q12 -10 26 -2 M110 96 q7 -6 16 -2" fill="none" stroke="#2A1F16" stroke-width="2.8" stroke-linecap="round"/>
+    <path d="M101 112 q-5 15 1 21 q4 3 9 -1" fill="none" stroke="#2A1F16" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+    <ellipse cx="102" cy="150" rx="5" ry="6.5" fill="#2A1F16"/>
   </g>
+</g>
 </svg>

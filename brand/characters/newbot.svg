@@ -1,10 +1,23 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="New bot"><title>New bot</title>
-  <path d="M100 24 C150 22 180 58 178 104 C176 150 142 178 98 176 C52 174 22 146 24 100 C26 56 54 26 100 24 Z" fill="#E9C9A6" stroke="#A9825C" stroke-width="5"/>
-  <g class="face">
-    <ellipse cx="70" cy="86" rx="11" ry="13" fill="#FFFDF9" stroke="#3A2615" stroke-width="3"/>
-    <ellipse cx="120" cy="86" rx="11" ry="13" fill="#FFFDF9" stroke="#3A2615" stroke-width="3"/>
-    <circle class="pupil" cx="73" cy="89" r="5" fill="#3A2615"/>
-    <circle class="pupil" cx="123" cy="89" r="5" fill="#3A2615"/>
-    <path d="M 97 80 q -9 18 0 22 q 4 2 9 -2 M 72 116 q 14 10 30 -2" fill="none" stroke="#3A2615" stroke-width="3" stroke-linecap="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="New bot">
+<title>A new bot, waiting for its first job</title>
+<defs><filter id="ink" x="-15%" y="-15%" width="130%" height="130%"><feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="2" seed="43"/><feDisplacementMap in="SourceGraphic" scale="2.8"/></filter></defs>
+<style>
+.breathe{animation:br 3.6s ease-in-out infinite;transform-origin:100px 178px}
+@keyframes br{0%,100%{transform:scale(1,1)}50%{transform:scale(1.025,.97)}}
+.z{animation:z 3.6s ease-in infinite;opacity:0}
+.z2{animation-delay:1.2s}
+@keyframes z{0%{opacity:0;transform:translate(0,0) scale(.6)}30%{opacity:1}100%{opacity:0;transform:translate(14px,-34px) scale(1.2)}}
+@media (prefers-reduced-motion: reduce){*{animation:none!important}.z{opacity:1}}
+</style>
+<g font-family="Georgia, serif" font-style="italic" font-weight="700" fill="#86684F"><text class="z" x="138" y="58" font-size="20">z</text><text class="z z2" x="150" y="46" font-size="15">z</text></g>
+<g class="breathe">
+  <path transform="translate(6 5)" fill="#E8C8A4" d="M96 40 C140 34 176 60 176 106 C176 150 144 178 100 176 C54 175 24 150 26 108 C28 66 56 44 96 40 Z"/>
+  <path fill="none" stroke="#2A1F16" stroke-width="3.4" filter="url(#ink)" d="M96 40 C140 34 176 60 176 106 C176 150 144 178 100 176 C54 175 24 150 26 108 C28 66 56 44 96 40 Z"/>
+  <ellipse cx="64" cy="124" rx="8" ry="5" fill="#D9925F" opacity=".35"/><ellipse cx="136" cy="122" rx="8" ry="5" fill="#D9925F" opacity=".35"/>
+  <g filter="url(#ink)" fill="none" stroke="#2A1F16" stroke-width="3" stroke-linecap="round">
+    <path d="M66 108 q10 7 20 0"/><path d="M112 106 q10 7 20 0"/>
+    <path d="M99 104 q-4 12 1 16 q3 2 7 -1" stroke-width="2.8"/>
+    <path d="M92 136 q8 4 15 0" stroke-width="2.8"/>
   </g>
+</g>
 </svg>

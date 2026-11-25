@@ -116,6 +116,17 @@ const edits = [
   { file: 'scripts/install.ps1', all: true, from: '-unpacked\\Hermes.exe"),', to: `-unpacked\\${p.display}.exe"),` },
   { file: 'scripts/install.ps1', from: '(Join-Path $desktopDir "release\\win-arm64-unpacked\\Hermes.exe")', to: `(Join-Path $desktopDir "release\\win-arm64-unpacked\\${p.display}.exe")` },
   { file: 'scripts/install.ps1', all: true, from: "'Hermes.lnk')", to: `'${p.display}.lnk')` },
+  // The installer's banner.
+  {
+    file: 'scripts/install.ps1',
+    from: 'Write-Host "|             * Hermes Agent Installer                    |"',
+    to: `Write-Host "|${(' '.repeat(17) + '* ' + p.display + ' Installer').padEnd(57)}|"`
+  },
+  {
+    file: 'scripts/install.ps1',
+    from: 'Write-Host "|  An open source AI agent by Nous Research.              |"',
+    to: `Write-Host "|${'  by Sparkle Solutions, built on Hermes Agent (Nous).'.padEnd(57)}|"`
+  },
   // Sparklebot is the desktop app: build it by default (-IncludeDesktop:$false still skips it).
   { file: 'scripts/install.ps1', from: '    [switch]$IncludeDesktop,', to: '    [switch]$IncludeDesktop = $true,' },
   { file: 'scripts/install.ps1', from: "$sc.Description = 'Hermes Agent'", to: `$sc.Description = '${p.display} (built on Hermes Agent)'` },

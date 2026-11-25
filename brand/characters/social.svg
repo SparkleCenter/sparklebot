@@ -1,10 +1,28 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Social"><title>Social</title>
-  <path d="M100 22 C152 22 182 50 182 90 C182 130 150 156 104 156 C92 156 82 155 72 152 L38 176 Q30 181 33 171 L42 142 C26 130 18 112 18 90 C18 50 48 22 100 22 Z" fill="#F2775A" stroke="#B4472F" stroke-width="5" stroke-linejoin="round"/>
-  <g class="face">
-    <ellipse cx="70" cy="78" rx="11" ry="13" fill="#FFFDF9" stroke="#3A2615" stroke-width="3"/>
-    <ellipse cx="120" cy="78" rx="11" ry="13" fill="#FFFDF9" stroke="#3A2615" stroke-width="3"/>
-    <circle class="pupil" cx="73" cy="81" r="5" fill="#3A2615"/>
-    <circle class="pupil" cx="123" cy="81" r="5" fill="#3A2615"/>
-    <path d="M 97 72 q -9 18 0 22 q 4 2 9 -2 M 72 108 q 14 10 30 -2" fill="none" stroke="#3A2615" stroke-width="3" stroke-linecap="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Social">
+<title>Social, the writing assistant</title>
+<defs><filter id="ink" x="-15%" y="-15%" width="130%" height="130%"><feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="2" seed="23"/><feDisplacementMap in="SourceGraphic" scale="2.8"/></filter></defs>
+<style>
+.blink{animation:blink 3.9s infinite;transform-box:fill-box;transform-origin:center}
+@keyframes blink{0%,91%,100%{transform:scaleY(1)}94%{transform:scaleY(.08)}97%{transform:scaleY(1)}}
+.talk{animation:talk .9s ease-in-out infinite;transform-box:fill-box;transform-origin:top center}
+@keyframes talk{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.55)}}
+.dot{animation:hop 1.2s ease-in-out infinite}
+.d2{animation-delay:.18s}.d3{animation-delay:.36s}
+@keyframes hop{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-7px)}}
+.sway{animation:sway 3.4s ease-in-out infinite;transform-origin:60px 170px}
+@keyframes sway{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(2deg)}}
+@media (prefers-reduced-motion: reduce){*{animation:none!important}}
+</style>
+<g fill="#2A1F16"><circle class="dot" cx="150" cy="24" r="5"/><circle class="dot d2" cx="166" cy="24" r="5"/><circle class="dot d3" cx="182" cy="24" r="5"/></g>
+<g class="sway">
+  <path transform="translate(5 6)" fill="#F07258" d="M100 34 C148 30 180 56 178 94 C176 130 148 152 106 152 C95 152 85 151 75 148 L46 170 C38 176 32 172 36 164 L45 140 C29 128 21 112 22 94 C24 56 54 36 100 34 Z"/>
+  <path fill="none" stroke="#2A1F16" stroke-width="3.4" stroke-linejoin="round" filter="url(#ink)" d="M100 34 C148 30 180 56 178 94 C176 130 148 152 106 152 C95 152 85 151 75 148 L46 170 C38 176 32 172 36 164 L45 140 C29 128 21 112 22 94 C24 56 54 36 100 34 Z"/>
+  <g filter="url(#ink)">
+    <ellipse cx="64" cy="106" rx="9" ry="6" fill="#D9483A" opacity=".45"/><ellipse cx="142" cy="104" rx="9" ry="6" fill="#D9483A" opacity=".45"/>
+    <g class="blink"><ellipse cx="80" cy="84" rx="11" ry="12.5" fill="#FFFDF8" stroke="#2A1F16" stroke-width="3"/><ellipse cx="121" cy="82" rx="11" ry="12.5" fill="#FFFDF8" stroke="#2A1F16" stroke-width="3"/></g>
+    <circle cx="83" cy="87" r="5" fill="#2A1F16"/><circle cx="124" cy="85" r="5" fill="#2A1F16"/>
+    <path d="M99 76 q-6 14 0 19 q4 2 8 -1" fill="none" stroke="#2A1F16" stroke-width="2.8" stroke-linecap="round"/>
+    <g class="talk"><path d="M84 110 q19 2 38 -1 q-3 22 -19 22 q-16 0 -19 -21 Z" fill="#2A1F16"/><path d="M95 124 q8 -6 16 0 q-2 6 -8 6 q-6 0 -8 -6 Z" fill="#F7A08F"/></g>
   </g>
+</g>
 </svg>
