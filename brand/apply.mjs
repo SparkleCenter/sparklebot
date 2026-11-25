@@ -205,6 +205,47 @@ const edits = [
     from: '    if not isinstance(nous_cfg, dict):\n        return True\n    return bool(nous_cfg.get("guest", True))',
     to: '    if not isinstance(nous_cfg, dict):\n        return False  # Sparklebot: Nous guests are opt-in\n    return bool(nous_cfg.get("guest", False))'
   },
+  // The built-in default is what load_config() starts from, so it must say false too (the patch
+  // above alone left fresh installs creating a Nous account; found 25.11.2026).
+  {
+    file: 'hermes_cli/config_defaults.py',
+    from: '        # up and nothing is used.\n        "guest": True,',
+    to: '        # up and nothing is used.\n        "guest": False,  # Sparklebot: no Nous account unless switched on'
+  },
+  // Prices for models Hermes cannot price itself (Azure Foundry deployments): config.yaml
+  // `model_pricing: {<deployment>: {input: <USD per 1M>, output: <USD per 1M>}}`. Without it,
+  // spending on Foundry shows as "unknown" / $0.
+  {
+    file: 'agent/usage_pricing.py',
+    from: 'def get_pricing_entry(\n    model_name: str,',
+    to: [
+      'def _user_pricing_override(model: str) -> Optional[PricingEntry]:',
+      '    """Sparklebot: a price from config.yaml `model_pricing` (USD per million tokens)."""',
+      '    try:',
+      '        from hermes_cli.config import load_config_readonly',
+      '        table = load_config_readonly().get("model_pricing") or {}',
+      '        row = table.get(model) or table.get((model or "").split("/")[-1])',
+      '    except Exception:',
+      '        return None',
+      '    if not isinstance(row, dict) or row.get("input") is None or row.get("output") is None:',
+      '        return None',
+      '    def _dec(value):',
+      '        return Decimal(str(value)) if value is not None else None',
+      '    return PricingEntry(',
+      '        input_cost_per_million=_dec(row["input"]), output_cost_per_million=_dec(row["output"]),',
+      '        cache_read_cost_per_million=_dec(row.get("cache_read")), source="user_override",',
+      '        pricing_version="config.model_pricing",',
+      '    )',
+      '',
+      '',
+      'def get_pricing_entry(\n    model_name: str,'
+    ].join('\n')
+  },
+  {
+    file: 'agent/usage_pricing.py',
+    from: '    route = resolve_billing_route(model_name, provider=provider, base_url=base_url)\n    if route.billing_mode == "subscription_included":\n        return _INCLUDED_ENTRY',
+    to: '    route = resolve_billing_route(model_name, provider=provider, base_url=base_url)\n    override = _user_pricing_override(route.model or model_name)\n    if override:\n        return override\n    if route.billing_mode == "subscription_included":\n        return _INCLUDED_ENTRY'
+  },
   // The app icon ships as sparklebot.ico. Windows caches shortcut icons by file path, and
   // resources\icon.ico is the path Hermes's own shortcut used, so a PC that had Hermes kept
   // showing the old picture. A new name forces Windows to read the Sparkle icon.
@@ -215,6 +256,27 @@ const edits = [
     to: `...(isWindows ? [path.join(resourcesPath ?? '', '${p.kebab}.ico'), path.join(appRoot, 'assets', 'icon.ico')] : []),`
   },
   { file: 'scripts/install.ps1', from: "$iconIco = Join-Path $workDir 'resources\\icon.ico'", to: `$iconIco = Join-Path $workDir 'resources\\${p.kebab}.ico'` },
+  // Bots list: the main bot (Spark) large on top (brand/files/.../spark-hero.tsx), the team below.
+  {
+    file: 'apps/desktop/src/plugins/hermes-bots/roster-pane.tsx',
+    from: "import { BotRow } from './bot-row'\n",
+    to: "import { BotRow } from './bot-row'\nimport { primaryRosterBot, SparkHero } from './spark-hero'\n"
+  },
+  {
+    file: 'apps/desktop/src/plugins/hermes-bots/roster-pane.tsx',
+    from: '      })}\n      {renderRosterContent({',
+    to: '      })}\n      <SparkHero bot={primaryRosterBot(roster)} />\n      {renderRosterContent({'
+  },
+  {
+    file: 'apps/desktop/src/plugins/hermes-bots/roster-pane-derivation.ts',
+    from: "import { botRosterKey, filterBots, preferReachableSameNameRows } from './data'",
+    to: "import { botRosterKey, filterBots, isDefaultBot, preferReachableSameNameRows } from './data'"
+  },
+  {
+    file: 'apps/desktop/src/plugins/hermes-bots/roster-pane-derivation.ts',
+    from: '      : preferReachableSameNameRows(filteredRoster).map((bot): RosterBotRow => ({',
+    to: '      : preferReachableSameNameRows(filteredRoster).filter(bot => !isDefaultBot(bot)).map((bot): RosterBotRow => ({'
+  },
   // Settings clean-up: hidden sections and sub-pages (brand/sparklebot.json settings), no pet tab,
   // no Hermes Cloud hosting card (we host in the customer's own Azure).
   {
@@ -415,6 +477,24 @@ for (const rel of icons) {
 }
 report.push([iconsDone === icons.length ? 'done' : 'to apply', 'icons', `${iconsDone} of ${icons.length} Sparkle icon files in place`])
 
+// Our own new files (brand/files mirrors the checkout). Hermes does not have them, so they may be new.
+const ownRoot = path.join(root, 'brand/files')
+const ownFiles = []
+if (existsSync(ownRoot)) {
+  ;(function walk(dir) {
+    for (const entry of readdirSync(dir)) {
+      const full = path.join(dir, entry)
+      if (statSync(full).isDirectory()) walk(full)
+      else ownFiles.push(path.relative(ownRoot, full))
+    }
+  })(ownRoot)
+}
+const ownDone = ownFiles.filter(rel => {
+  const target = path.join(root, rel)
+  return existsSync(target) && readFileSync(target).equals(readFileSync(path.join(ownRoot, rel)))
+}).length
+report.push([ownDone === ownFiles.length ? 'done' : 'to apply', 'own files', `${ownDone} of ${ownFiles.length} Sparklebot files in place`])
+
 // The public front page: Sparklebot's README; Hermes's own README is kept beside it.
 const readme = path.join(root, 'README.md')
 const hermesReadme = path.join(root, 'README.hermes-agent.md')
@@ -450,4 +530,5 @@ for (const [full, text] of files) {
   if (out !== before) writeFileSync(full, out)
 }
 for (const rel of icons) cpSync(path.join(iconRoot, rel), path.join(root, rel))
+for (const rel of ownFiles) cpSync(path.join(ownRoot, rel), path.join(root, rel))
 console.log(pending ? '\nApplied. Run with --check to confirm.' : '\nAlready fully branded. Nothing changed.')

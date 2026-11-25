@@ -1,7 +1,7 @@
 import { type CanonicalRoomLive, canonicalRoomLiveKey } from './canonical-group-details'
 import type { GatewayGroupRoom } from './canonical-group-registry'
 import { botActivitySession } from './data'
-import { botRosterKey, filterBots, preferReachableSameNameRows } from './data'
+import { botRosterKey, filterBots, isDefaultBot, preferReachableSameNameRows } from './data'
 import type { $groupChats } from './group-chat'
 import { groupChatMemberBots, groupChatNames, groupLastActivity } from './group-membership'
 import { sortGroupRosterRows } from './group-order'
@@ -148,7 +148,7 @@ export function deriveRosterRows(input: RosterRowsInput) {
   const botRows =
     rowKindFilter === 'groups'
       ? []
-      : preferReachableSameNameRows(filteredRoster).map((bot): RosterBotRow => ({
+      : preferReachableSameNameRows(filteredRoster).filter(bot => !isDefaultBot(bot)).map((bot): RosterBotRow => ({
           kind: 'bot',
           bot,
           pinned: isPinned(bot),

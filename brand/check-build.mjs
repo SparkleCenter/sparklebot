@@ -30,9 +30,15 @@ check(`resources/${brand.kebab}.ico is the Sparkle icon`, existsSync(ico) && rea
 check('no resources/icon.ico (Hermes\'s cached path)', !existsSync(path.join(unpacked, 'resources', 'icon.ico')),
   'Windows would show the cached Hermes icon on PCs that had Hermes')
 
+// The default that load_config() starts from decides it, not only the fallback in anon_auth.py.
 const anon = readFileSync(path.join(root, 'hermes_cli/anon_auth.py'), 'utf8')
-check('Nous guests are off by default', anon.includes('nous_cfg.get("guest", False)'),
+const defaults = readFileSync(path.join(root, 'hermes_cli/config_defaults.py'), 'utf8')
+check('Nous guests are off by default', anon.includes('nous_cfg.get("guest", False)') &&
+  /"guest":\s*False/.test(defaults) && !/"guest":\s*True/.test(defaults),
   'Sparklebot would create an anonymous Nous account and route search through Nous')
+check('Foundry prices can be set (model_pricing)',
+  readFileSync(path.join(root, 'agent/usage_pricing.py'), 'utf8').includes('_user_pricing_override'),
+  'spending on Azure Foundry would show as unknown / $0')
 
 let failed = 0
 for (const { name, ok, hint } of checks) {

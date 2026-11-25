@@ -608,11 +608,33 @@ def _models_dev_pricing_entry(route: BillingRoute) -> Optional[PricingEntry]:
     )
 
 
+def _user_pricing_override(model: str) -> Optional[PricingEntry]:
+    """Sparklebot: a price from config.yaml `model_pricing` (USD per million tokens)."""
+    try:
+        from hermes_cli.config import load_config_readonly
+        table = load_config_readonly().get("model_pricing") or {}
+        row = table.get(model) or table.get((model or "").split("/")[-1])
+    except Exception:
+        return None
+    if not isinstance(row, dict) or row.get("input") is None or row.get("output") is None:
+        return None
+    def _dec(value):
+        return Decimal(str(value)) if value is not None else None
+    return PricingEntry(
+        input_cost_per_million=_dec(row["input"]), output_cost_per_million=_dec(row["output"]),
+        cache_read_cost_per_million=_dec(row.get("cache_read")), source="user_override",
+        pricing_version="config.model_pricing",
+    )
+
+
 def get_pricing_entry(
     model_name: str, provider: Optional[str] = None, base_url: Optional[str] = None,
     api_key: Optional[str] = None,
 ) -> Optional[PricingEntry]:
     route = resolve_billing_route(model_name, provider=provider, base_url=base_url)
+    override = _user_pricing_override(route.model or model_name)
+    if override:
+        return override
     if route.billing_mode == "subscription_included":
         return _INCLUDED_ENTRY
     if route.provider == "openrouter":

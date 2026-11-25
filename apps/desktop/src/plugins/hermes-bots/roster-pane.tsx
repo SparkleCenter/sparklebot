@@ -2,6 +2,7 @@ import { host, useI18n, useValue } from '@hermes/plugin-sdk'
 import { useEffect, useRef, useState } from 'react'
 
 import { BotRow } from './bot-row'
+import { primaryRosterBot, SparkHero } from './spark-hero'
 import {
   $botChatFocused,
   $botsPaneVisible,
@@ -509,6 +510,7 @@ export function BotsPane() {
         gatewayFilter,
         setGatewayFilter
       })}
+      <SparkHero bot={primaryRosterBot(roster)} />
       {renderRosterContent({
         b,
         staleNotice,
