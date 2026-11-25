@@ -1,7 +1,9 @@
 # Sparklebot brand overlay
 
-Sparklebot is Hermes Agent (Nous Research, MIT licence) with Sparkle's name and icon on the outside. The engine is
-unchanged. Plan and decisions: `C:\dev\sparkle-intelligence\docs\SPARKLE_BOT_PLAN.md` (sections 4–7).
+Sparklebot is Hermes Agent (Nous Research, MIT licence) with Sparkle's name and icon on the outside, plus a few
+listed engine edits: default settings, Foundry pricing and measured speed fixes (`patches/speed.mjs`). Every edit
+names the exact Hermes text it replaces (`apply.mjs`). Plan and decisions are kept in Sparkle's internal planning
+repository.
 
 The repository is Hermes Agent **v0.23.2** (commit `ae2a81c`) plus this `brand/` folder and the files the
 overlay changes.
@@ -15,6 +17,7 @@ overlay changes.
 | `make_icons.py` | Makes the Sparkle version of every Hermes icon file (same names and sizes) into `icons/` |
 | `icons/` | Generated. 72 files: app icon, Windows tiles, in-app badge |
 | `apply.mjs` | Writes the names and icons into the checkout. Every text edit names the exact Hermes text it replaces; if Hermes moved it, it stops before writing anything. `--check` only reports |
+| `patches/speed.mjs` | Three measured speed fixes (bot switch, Capabilities, Messaging), applied by `apply.mjs` with the same exact-text rules. Their tests sit in `files/` |
 | `build-local.ps1` | Builds an unsigned test app for this PC: `apps\desktop\release\win-unpacked\Sparklebot.exe` |
 | `README.public.md` | The repository's front page; the overlay copies it to `README.md` |
 

@@ -161,9 +161,28 @@ def _require_platform(platform_id: str) -> dict[str, Any]:
     return entry
 
 
+# Sparklebot: one Channels request reads the gateway config and the gateway's liveness once and shares
+# them across its ~30 platform rows; every row used to repeat load_gateway_config() (6-24 s per page open).
+# The memo is a plain dict ``_platform_payloads`` makes for that one call: nothing outlives the request.
+def _request_memo(memo: Optional[dict], key: str, compute):
+    """``compute()`` once per ``memo``; its result, or the exception it raised, replays to every later
+    caller, so each row keeps its own fallback. Without a memo it just runs, as before."""
+    if memo is None:
+        return compute()
+    if key not in memo:
+        try:
+            memo[key] = (compute(), None, None)
+        except Exception as exc:  # health: allow BLE001 -- stored, then re-raised below to each caller's own handler
+            memo[key] = (None, exc, exc.__traceback__)
+    value, error, tb = memo[key]
+    if error is not None:
+        raise error.with_traceback(tb)
+    return value
+
+
 def _platform_enablement(
     platform_id: str, entry: dict[str, Any], env_on_disk: dict[str, str], scoped: bool,
-    source_keys: Collection[str] = (),
+    source_keys: Collection[str] = (), request_memo: Optional[dict] = None,
 ) -> tuple[bool, bool, dict | None]:
     """(enabled, configured, home_channel). Profile-scoped: the profile's config.yaml, .env and
     enabled secret sources only, never ``load_gateway_config()`` (see ``builtin_platform_status``)."""
@@ -191,7 +210,7 @@ def _platform_enablement(
     try:
         from gateway.config import Platform, load_gateway_config
 
-        gateway_config = load_gateway_config()
+        gateway_config = _request_memo(request_memo, "gateway_config", load_gateway_config)  # Sparklebot: shared
         platform = Platform(platform_id)
         platform_config = gateway_config.platforms.get(platform)
         enabled = bool(platform_config and platform_config.enabled)
@@ -203,7 +222,8 @@ def _platform_enablement(
     return enabled, configured, home_channel
 
 
-def _relay_disabled_platform_ids(scoped: bool) -> frozenset[str]:
+# Sparklebot: takes the request memo, so this label and every row share one gateway config load.
+def _relay_disabled_platform_ids(scoped: bool, request_memo: Optional[dict] = None) -> frozenset[str]:
     """Platforms the GATEWAY_RELAY_URL relay-exclusive rule switches off at gateway load
     (#141175), read from the same load_gateway_config() the unscoped enablement arm uses, so the
     page can say "Team Gateway" instead of a bare "Disabled" that reverts every restart.
@@ -213,7 +233,7 @@ def _relay_disabled_platform_ids(scoped: bool) -> frozenset[str]:
     try:
         from gateway.config import load_gateway_config
 
-        platforms = load_gateway_config().platforms
+        platforms = _request_memo(request_memo, "gateway_config", load_gateway_config).platforms  # Sparklebot: shared
         return frozenset(p.value for p, cfg in platforms.items() if cfg.disabled_by_relay)
     except Exception:  # health: allow BLE001 -- advisory label; an unreadable config keeps the plain state
         _log.debug("relay-disabled platform lookup failed", exc_info=True)
@@ -224,6 +244,7 @@ def _messaging_platform_payload(
     entry: dict[str, Any], env_on_disk: dict[str, str], runtime: dict | None,
     scoped: bool = False, profile_home: Optional[Path] = None, source_keys: Collection[str] = (),
     relay_disabled: frozenset[str] = frozenset(), relay_view: tuple[frozenset[str], bool] = (frozenset(), False),
+    request_memo: Optional[dict] = None,  # Sparklebot: reads shared by every row of one request (_request_memo)
 ) -> dict[str, Any]:
     platform_id = entry["id"]
     rt = runtime if isinstance(runtime, dict) else {}
@@ -236,12 +257,13 @@ def _messaging_platform_payload(
     # scoped to a named profile: gateway/status readers resolve process-level paths
     # and do NOT follow the HERMES_HOME contextvar override, so without it messaging
     # silently reports another profile's gateway.
-    gateway_running = resolve_gateway_liveness(
+    # Sparklebot: profile_home and runtime are the same for every row of one request, so one verdict serves all.
+    gateway_running = _request_memo(request_memo, "gateway_running", lambda: resolve_gateway_liveness(
         profile_dir=profile_home, runtime=runtime,
         health_probe=_probe_gateway_health if _GATEWAY_HEALTH_URL else None,
         pid_probe=get_running_pid_cached, runtime_reader=read_runtime_status,
         runtime_pid_probe=get_runtime_status_running_pid,
-    ).running
+    ).running)
     if not gateway_running:
         # gateway_state.json outlives its writer and keeps per-platform entries across
         # restarts, so a stopped gateway that once ran WITHOUT credentials still says
@@ -263,7 +285,8 @@ def _messaging_platform_payload(
             "value": value if info["is_list"] else None, **info,
         })
 
-    enabled, configured, home_channel = _platform_enablement(platform_id, entry, env_on_disk, scoped, source_keys)
+    enabled, configured, home_channel = _platform_enablement(platform_id, entry, env_on_disk, scoped, source_keys,
+                                                             request_memo=request_memo)  # Sparklebot: shared reads
     if gateway_running and runtime_platform.get("mirrored_from") and platform_id in _LISTENER_MIRRORS:
         # Served secondary: the default's shared listener already answers this platform at
         # /p/<profile>/... (enabling it locally 409s), so the secondary's own empty config
@@ -333,11 +356,13 @@ def _platform_payloads(scoped_dir: Optional[Path], entries) -> list[dict[str, An
     scoped = scoped_dir is not None
     source_values = get_secret_source_values(scoped_dir) if scoped else {}
     source_keys = frozenset(key for key, value in source_values.items() if str(value).strip())
-    relay_disabled = _relay_disabled_platform_ids(scoped)
+    # Sparklebot: one memo per call, so the gateway config and liveness are read once instead of once per row.
+    request_memo: dict = {}
+    relay_disabled = _relay_disabled_platform_ids(scoped, request_memo=request_memo)
     relay_view = _relay_channel_view(own_home)
     return [_messaging_platform_payload(entry, env_on_disk, runtime, scoped=scoped, profile_home=scoped_dir,
                                         source_keys=source_keys, relay_disabled=relay_disabled,
-                                        relay_view=relay_view)
+                                        relay_view=relay_view, request_memo=request_memo)
             for entry in entries]
 
 

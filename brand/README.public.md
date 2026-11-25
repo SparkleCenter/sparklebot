@@ -79,8 +79,9 @@ Talk to us: [sparklesolutions.ee](https://sparklesolutions.ee).
 
 ## How this repository works
 
-Sparklebot is Hermes Agent plus a small brand layer in [`brand/`](brand/README.md): names, icons and a few
-texts. The engine is unchanged. When Nous publishes a new Hermes version, we take it, re-apply the brand layer,
+Sparklebot is Hermes Agent plus a small layer in [`brand/`](brand/README.md): names, icons and texts, a few
+default settings, Foundry pricing and some measured speed fixes. Every change names the exact Hermes text it
+replaces, so it is checked again on each new Hermes version. When Nous publishes one, we take it, re-apply the layer,
 check that it still fits, and only then publish it here. The `hermes` command, the `@hermes` handle and all of
 Hermes's own documentation stay as they are; see [`README.hermes-agent.md`](README.hermes-agent.md).
 

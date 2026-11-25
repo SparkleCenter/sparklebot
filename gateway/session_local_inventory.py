@@ -131,6 +131,152 @@ def _session_provider(view, config=None):
                                      getattr(view, "base_url", None), getattr(view, "model", None), config=config)
 
 
+# Sparklebot: a bot switch (session.resume) rebuilt this whole inventory, and its tool snapshot, toolset
+# availability probes and skills scan were most of its ~1.8 s (measured 25.11.2026). The inventory is display
+# only (banner, status bar, a lazy session tool count): the agent builds its own tool list on its first turn,
+# so a cached copy never changes what the agent can do. Each cached section is keyed by everything it reads
+# that a stat or a counter can show (profile, the resolved session config, config.yaml, .env and auth.json,
+# the process env, the tool registry generation, the check_fn cache epoch, every skill dir and SKILL.md), so
+# the first request after such a change rebuilds it. What only a probe sees (a daemon, a binary on PATH, the
+# environments or apps a skill needs) shows within _SB_INVENTORY_TTL_S plus the 30 s the check_fn verdicts
+# under it keep. Git branch, project, MCP status, provider, version and update notice stay uncached.
+import copy
+import hashlib
+import json
+import os
+import threading
+import time
+
+_SB_INVENTORY_TTL_S = 30.0  # the same 30 s the check_fn verdicts and the skills catalog under it keep
+_SB_INVENTORY_MAX = 64
+_SB_VOLATILE_ENV = frozenset({"HERMES_SESSION_ID"})  # rewritten by every agent build; no section reads it
+_sb_inventory: dict = {}  # key -> (time.monotonic() when its build started, value)
+_sb_inventory_gates: dict = {}  # key -> the lock its one in-flight build holds
+_sb_inventory_lock = threading.Lock()
+
+
+def _sb_stat(path):
+    try:
+        st = os.stat(path)
+    except (OSError, TypeError, ValueError):
+        return None
+    return st.st_mtime_ns, st.st_size
+
+
+def _sb_inventory_key(config):
+    """The key part every cached section shares, read inside the owner profile scope; None: no caching."""
+    try:
+        import model_tools  # noqa: F401 -- its first import registers the tools: read the generation after it
+        from hermes_cli.config import get_config_path
+        from hermes_constants import get_default_hermes_root, get_hermes_home
+        from tools.environments.sandbox_scope import hosted_scope
+        from tools.registry import CHECK_FN_CACHE_BYPASS, check_fn_cache_epoch, check_fn_cache_scope, registry
+        scope = check_fn_cache_scope()
+        if scope == CHECK_FN_CACHE_BYPASS or hosted_scope() is not None:
+            return None  # no profile identity, or a hosted tenant: the model_tools memo stays off there too
+        try:
+            text = json.dumps(config, sort_keys=True, default=repr)
+        except (TypeError, ValueError):
+            text = repr(config)
+        home, root = get_hermes_home(), get_default_hermes_root()
+        files = (get_config_path(), home / ".env", home / "auth.json", root / ".env", root / "auth.json")
+        env = frozenset(item for item in os.environ.items() if item[0] not in _SB_VOLATILE_ENV)
+        return (registry.current_scope_key(), str(home), scope,
+                hashlib.sha256(text.encode("utf-8", "surrogatepass")).hexdigest(),
+                tuple(_sb_stat(path) for path in files), hash(env),
+                registry._generation, check_fn_cache_epoch())
+    except Exception:  # health: allow BLE001 -- no key: the inventory is built uncached, as before
+        logger.debug("session inventory cache key unavailable", exc_info=True)
+        return None
+
+
+def _sb_skills_sig():
+    """The skills catalog change signature (agent.skill_commands._skill_dirs_signature: each skill dir with
+    its mtime and child dirs, the disabled set, the platform) plus the mtime and size of each SKILL.md, so an
+    in-place edit shows too; None: no caching."""
+    try:
+        from agent.skill_commands import _skill_dirs_signature
+        sig = _skill_dirs_signature()
+        if sig is None:
+            return None
+        return sig, tuple(_sb_stat(os.path.join(entry[0], "SKILL.md")) for entry in sig[0])
+    except Exception:  # health: allow BLE001 -- no signature: skills are scanned uncached, as before
+        logger.debug("skills signature unavailable", exc_info=True)
+        return None
+
+
+def _sb_key(*parts):
+    """A cache key from *parts*, or None (build uncached) when a part is unknown or unhashable."""
+    if any(part is None for part in parts):
+        return None
+    try:
+        hash(parts)
+    except TypeError:
+        return None
+    return parts
+
+
+def _sb_cached(key, build, *, keep=None):
+    """build(), reused for _SB_INVENTORY_TTL_S under *key* (None: always built). Threads asking for one key
+    meanwhile wait for its one build. A build that raises, or that *keep* rejects, is not stored. Callers get
+    deep copies, so nothing they change reaches the cache."""
+    if key is None:
+        return build()
+    with _sb_inventory_lock:
+        hit = _sb_inventory.get(key)
+        if hit is not None and time.monotonic() - hit[0] < _SB_INVENTORY_TTL_S:
+            return copy.deepcopy(hit[1])
+        gate = _sb_inventory_gates.setdefault(key, threading.Lock())
+    with gate:
+        try:
+            with _sb_inventory_lock:
+                hit = _sb_inventory.get(key)
+                if hit is not None and time.monotonic() - hit[0] < _SB_INVENTORY_TTL_S:
+                    return copy.deepcopy(hit[1])
+            started = time.monotonic()
+            value = build()
+            if keep is None or keep(value):
+                stored = copy.deepcopy(value)
+                with _sb_inventory_lock:
+                    now = time.monotonic()
+                    for old in [k for k, (at, _v) in _sb_inventory.items() if now - at >= _SB_INVENTORY_TTL_S]:
+                        del _sb_inventory[old]
+                    _sb_inventory.pop(key, None)
+                    while len(_sb_inventory) >= _SB_INVENTORY_MAX:
+                        del _sb_inventory[next(iter(_sb_inventory))]
+                    _sb_inventory[key] = (started, stored)
+            return value
+        finally:
+            with _sb_inventory_lock:
+                if _sb_inventory_gates.get(key) is gate:
+                    del _sb_inventory_gates[key]
+
+
+def _sb_policy_tool_names(policy, config):
+    """_policy_tools as the inventory keeps it: (enabled toolsets, tool names by toolset)."""
+    enabled, tools = _policy_tools(policy, config)
+    return enabled, _grouped(tools)
+
+
+def _sb_banner_skills(fresh):
+    """hermes_cli.banner.get_available_skills, the non-CLI skills builder. Under a routed profile banner keeps
+    no memo and reads the tools.skills_tool catalog cache, whose own 30 s TTL is all that shows an in-place
+    SKILL.md edit. A *fresh* build (the inventory cache missed: a skill dir or SKILL.md changed, or the entry
+    expired) drops that one catalog entry first, as _cli_skills does, so the scan reads the files and stores a
+    new entry. Uncached (*fresh* False) it is the plain call, as before, and so is a fresh build if Hermes ever
+    moves that cache or the home override (found by the final review of 25.11.2026)."""
+    from hermes_cli.banner import get_available_skills
+    if fresh:
+        try:
+            from hermes_constants import get_hermes_home_override
+            from tools import skills_tool
+            if get_hermes_home_override() is not None:
+                skills_tool._SKILLS_CACHE.pop(("filtered", False), None)
+        except Exception:  # health: allow BLE001 -- Hermes moved one of these: the plain call, as before
+            logger.debug("skills catalog entry not dropped", exc_info=True)
+    return get_available_skills()
+
+
 def session_inventory(authority, policy, agent, cwd):
     """Main's banner/status fields for one session. Each section degrades to main's empty value on
     its own, so one failing builder never blanks the others (main wrapped each in ``suppress``)."""
@@ -141,6 +287,7 @@ def session_inventory(authority, policy, agent, cwd):
                   "branch": git_probe.branch(cwd) if cwd else "", "project": _project(cwd)}
     with owner_scope(authority):
         config = policy.config(authority, secrets=False) if policy is not None else {}
+        sb_key = _sb_inventory_key(config)  # Sparklebot: shared part of the inventory cache keys
         if agent is not None:
             from agent.voice_turn_route import session_runtime_view
             info["provider"] = _session_provider(session_runtime_view(agent), config if policy is not None else None)
@@ -155,23 +302,29 @@ def session_inventory(authority, policy, agent, cwd):
             enabled = []
             if policy is not None:
                 try:
-                    enabled, tools = _policy_tools(policy, config)
-                    info["tools"] = _grouped(tools)
+                    # Sparklebot: cached per policy (_sb_cached).
+                    enabled, info["tools"] = _sb_cached(
+                        _sb_key(sb_key, "tools", policy), lambda: _sb_policy_tool_names(policy, config))
                 except Exception:  # health: allow BLE001 -- main's suppress: the banner shows no tools, not an error
                     logger.warning("session inventory: tool snapshot failed", exc_info=True)
         info["enabled_toolsets"] = sorted(enabled)
         with contextlib.suppress(Exception):
             # The classic CLI banner colours lazy (yellow) / disabled (red) tools from this.
             from hermes_cli.banner import compute_toolset_availability
-            info["tool_availability"] = compute_toolset_availability(enabled)
+            # Sparklebot: cached per enabled toolset set (_sb_cached).
+            info["tool_availability"] = _sb_cached(
+                _sb_key(sb_key, "availability", tuple(sorted(map(str, enabled)))),
+                lambda: compute_toolset_availability(enabled))
         if policy is not None and policy.source == "cli":
             info.update(_cli_startup_notices(enabled), unknown_toolsets=_unknown_toolsets(enabled, config))
         with contextlib.suppress(Exception):
-            if policy is not None and policy.source == "cli":
-                info["skills"] = _cli_skills()
-            else:
-                from hermes_cli.banner import get_available_skills
-                info["skills"] = get_available_skills()
+            # Sparklebot: the two skill builders, cached per skills signature (_sb_cached); an empty
+            # result (a failed scan reads the same) is not kept.
+            cli_surface = policy is not None and policy.source == "cli"
+            skills_key = _sb_key(sb_key, "skills", cli_surface, _sb_skills_sig())
+            info["skills"] = _sb_cached(
+                skills_key, _cli_skills if cli_surface else lambda: _sb_banner_skills(skills_key is not None),
+                keep=bool)
         with contextlib.suppress(Exception):
             from tools.mcp_tool_discovery import get_mcp_status
             info["mcp_servers"] = get_mcp_status()

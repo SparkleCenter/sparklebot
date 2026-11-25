@@ -8,12 +8,15 @@
 //   node brand/apply.mjs           apply (safe to run again)
 //   node brand/apply.mjs --check   only report; exit 1 if anything is not branded yet
 //
-// Outside only: names, icons, window title, package metadata. The engine, the `hermes`
+// Mostly the outside: names, icons, texts, window title, package metadata. A few listed engine
+// edits too (Nous guest off by default, Foundry prices, window behaviour) and brand/patches/
+// (measured speed fixes, no behaviour change), all under the same exact-text rules. The `hermes`
 // command and the `@hermes` handle stay as Hermes, as the plan decides.
 
 import { cpSync, existsSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import speedEdits from './patches/speed.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const checkOnly = process.argv.includes('--check')
@@ -312,6 +315,18 @@ const edits = [
     from: '      : preferReachableSameNameRows(filteredRoster).map((bot): RosterBotRow => ({',
     to: '      : preferReachableSameNameRows(filteredRoster).filter(bot => !isDefaultBot(bot)).map((bot): RosterBotRow => ({'
   },
+  // Bots list previews: a routine's delivery reads "Market and tender radar" instead of the engine's
+  // internal header ("[Cronjob "…" output — scheduled job, not the user. …]"). The roster sends only the
+  // first 80 characters, which end inside the header; untruncated text reads "<routine>: <first words>".
+  // Test: brand/files/apps/desktop/src/plugins/hermes-bots/labels.cron-preview.test.ts
+  {
+    file: 'apps/desktop/src/plugins/hermes-bots/labels.ts',
+    from: "export function stripPreviewMarkdown(text: unknown) {\n  return String(text || '')\n",
+    to: String.raw`export function stripPreviewMarkdown(text: unknown) {
+  return String(text || '')
+    .replace(/^\s*\[Cronjob "(.+?)" output — [^\]]*(\]\s*(?:#{1,6}\s+)?)?/, (_, name, closed) => (closed ? name + ': ' : name))
+`
+  },
   // Settings clean-up: hidden sections and sub-pages (brand/sparklebot.json settings), no pet tab,
   // no Hermes Cloud hosting card (we host in the customer's own Azure).
   {
@@ -399,6 +414,7 @@ const edits = [
     to: `      before: '${p.display} is built on Hermes Agent by Nous Research. Use of Nous services is subject to their ',`
   }
 ]
+edits.push(...speedEdits)
 
 // English app texts: the word Hermes inside quoted text becomes the product name, except where
 // it names Nous's own product or service. Lowercase `hermes` (the command, @hermes) is untouched.
@@ -453,7 +469,7 @@ for (const edit of edits) {
     report.push(['done', edit.file, edit.to.trim().split('\n')[0]])
   } else if (ours === 0 && original === 1) {
     report.push(['to apply', edit.file, edit.to.trim().split('\n')[0]])
-    files.set(full, text.replace(edit.from, edit.to))
+    files.set(full, text.replace(edit.from, () => edit.to))
   } else {
     problems += 1
     report.push(['PROBLEM', edit.file, `Hermes text found ${original} times, ours ${ours} times: ${edit.from.trim().split('\n')[0]}`])

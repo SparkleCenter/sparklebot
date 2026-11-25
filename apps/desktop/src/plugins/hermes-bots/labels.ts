@@ -132,6 +132,7 @@ export function botProfileIdentity(name: string, title: string) {
  *  characters in the preview line. */
 export function stripPreviewMarkdown(text: unknown) {
   return String(text || '')
+    .replace(/^\s*\[Cronjob "(.+?)" output — [^\]]*(\]\s*(?:#{1,6}\s+)?)?/, (_, name, closed) => (closed ? name + ': ' : name))
     .replace(/```[\s\S]*?```/g, ' ')
     .replace(/`([^`\n]*)`/g, '$1')
     .replace(/!\[([^\]]*)\]\([^)]*\)/g, '$1')

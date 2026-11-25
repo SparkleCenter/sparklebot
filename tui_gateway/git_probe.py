@@ -34,7 +34,33 @@ def run_git(cwd: str, *args: str) -> str:
     return bounded_git_probe(["git", "-C", cwd, *args], timeout=_GIT_TIMEOUT)
 
 
+def _no_git_here(cwd: str) -> bool:
+    """Sparklebot: True when git cannot find a repo at *cwd*: no .git entry and no HEAD file (a bare repo, or
+    a cwd inside a git dir) in it or any parent, on its own path or on its resolved one (a symlink or junction
+    into a checkout), and no GIT_DIR or GIT_WORK_TREE set. Lets branch() skip its two failing git spawns
+    (~150 ms each on Windows) for a non-repo cwd, such as the home folder Bot Chat opens in on every bot
+    switch. Stats only, nothing cached: a git init shows on the next call. Any doubt answers False, and git
+    decides as before."""
+    if os.environ.get("GIT_DIR") or os.environ.get("GIT_WORK_TREE"):
+        return False
+    try:
+        start = os.path.abspath(cwd)
+        for path in {start, os.path.realpath(start)}:
+            while True:
+                if os.path.lexists(os.path.join(path, ".git")) or os.path.lexists(os.path.join(path, "HEAD")):
+                    return False
+                parent = os.path.dirname(path)
+                if parent == path:
+                    break
+                path = parent
+        return True
+    except (OSError, TypeError, ValueError):
+        return False
+
+
 def branch(cwd: str) -> str:
+    if cwd and _no_git_here(cwd):  # Sparklebot: no repo can be there, so no git spawn
+        return ""
     return run_git(cwd, "branch", "--show-current") or run_git(cwd, "rev-parse", "--short", "HEAD")
 
 
