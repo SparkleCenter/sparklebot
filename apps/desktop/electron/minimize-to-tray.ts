@@ -183,7 +183,7 @@ export function createMinimizeToTray(options: Options) {
             height: process.platform === 'darwin' ? 18 : 24
           })
         )
-        tray.setToolTip('Hermes')
+        tray.setToolTip('Sparklebot')
         tray.setContextMenu(
           Menu.buildFromTemplate([
             { label: 'Show Sparklebot', click: restore },
@@ -299,10 +299,10 @@ export function createMinimizeToTray(options: Options) {
   }
 
   async function start() {
-    let on = false
+    let on = true // Sparklebot: close to the tray unless switched off
 
     try {
-      on = JSON.parse(fs.readFileSync(options.preferencesPath, 'utf8')).enabled === true
+      on = JSON.parse(fs.readFileSync(options.preferencesPath, 'utf8')).enabled !== false
     } catch {
       // Missing or malformed preference preserves ordinary minimize/close.
     }

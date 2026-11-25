@@ -40,6 +40,15 @@ check('Foundry prices can be set (model_pricing)',
   readFileSync(path.join(root, 'agent/usage_pricing.py'), 'utf8').includes('_user_pricing_override'),
   'spending on Azure Foundry would show as unknown / $0')
 
+// Window behaviour Omar asked for (25.11.2026): starts with Windows and closes to the tray by default.
+const mainTs = readFileSync(path.join(root, 'apps/desktop/electron/main.ts'), 'utf8')
+const trayTs = readFileSync(path.join(root, 'apps/desktop/electron/minimize-to-tray.ts'), 'utf8')
+check('starts with Windows by default (switch in Settings)', mainTs.includes('startAtLogin.start()') &&
+  existsSync(path.join(root, 'apps/desktop/electron/start-at-login.ts')),
+  'the app would not start when the PC starts')
+check('X closes to the tray by default', trayTs.includes('.enabled !== false'),
+  'closing the window would quit the app instead of keeping it in the tray')
+
 let failed = 0
 for (const { name, ok, hint } of checks) {
   console.log(`${ok ? 'ok  ' : 'FAIL'}  ${name}${ok ? '' : `  (${hint})`}`)

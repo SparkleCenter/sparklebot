@@ -256,6 +256,41 @@ const edits = [
     to: `...(isWindows ? [path.join(resourcesPath ?? '', '${p.kebab}.ico'), path.join(appRoot, 'assets', 'icon.ico')] : []),`
   },
   { file: 'scripts/install.ps1', from: "$iconIco = Join-Path $workDir 'resources\\icon.ico'", to: `$iconIco = Join-Path $workDir 'resources\\${p.kebab}.ico'` },
+  // Window behaviour: X closes to the tray by default, and the app starts with Windows by default
+  // (brand/files/.../start-at-login.ts and start-at-login-setting.tsx); both have a switch in
+  // Settings → Appearance → Window & layout.
+  {
+    file: 'apps/desktop/electron/minimize-to-tray.ts',
+    from: '    let on = false\n\n    try {\n      on = JSON.parse(fs.readFileSync(options.preferencesPath, \'utf8\')).enabled === true',
+    to: '    let on = true // Sparklebot: close to the tray unless switched off\n\n    try {\n      on = JSON.parse(fs.readFileSync(options.preferencesPath, \'utf8\')).enabled !== false'
+  },
+  { file: 'apps/desktop/electron/minimize-to-tray.ts', from: "tray.setToolTip('Hermes')", to: `tray.setToolTip('${p.display}')` },
+  {
+    file: 'apps/desktop/electron/main.ts',
+    from: "import { createMinimizeToTray } from './minimize-to-tray'\n",
+    to: "import { createMinimizeToTray } from './minimize-to-tray'\nimport { createStartAtLogin } from './start-at-login'\n"
+  },
+  {
+    file: 'apps/desktop/electron/main.ts',
+    from: '  isQuittingForHandoff: () => isQuittingForHandoff,\n  log: rememberLog\n})\n',
+    to: "  isQuittingForHandoff: () => isQuittingForHandoff,\n  log: rememberLog\n})\n\nconst startAtLogin = createStartAtLogin({\n  preferencesPath: path.join(app.getPath('userData'), 'start-at-login.json'),\n  log: rememberLog\n})\n"
+  },
+  { file: 'apps/desktop/electron/main.ts', from: '  void minimizeToTray.start()\n', to: '  void minimizeToTray.start()\n  startAtLogin.start()\n' },
+  {
+    file: 'apps/desktop/electron/preload.ts',
+    from: "      return () => ipcRenderer.removeListener('hermes:minimize-to-tray:changed', listener)\n    }\n  },\n",
+    to: "      return () => ipcRenderer.removeListener('hermes:minimize-to-tray:changed', listener)\n    }\n  },\n  startAtLogin: {\n    get: () => ipcRenderer.invoke('hermes:start-at-login:get'),\n    set: on => ipcRenderer.invoke('hermes:start-at-login:set', on),\n    onChanged: callback => {\n      const listener = (_event, status) => callback(status)\n      ipcRenderer.on('hermes:start-at-login:changed', listener)\n\n      return () => ipcRenderer.removeListener('hermes:start-at-login:changed', listener)\n    }\n  },\n"
+  },
+  {
+    file: 'apps/desktop/src/app/settings/appearance-settings.tsx',
+    from: "import { MinimizeToTraySetting } from './minimize-to-tray-setting'\n",
+    to: "import { MinimizeToTraySetting } from './minimize-to-tray-setting'\nimport { StartAtLoginSetting } from './start-at-login-setting'\n"
+  },
+  {
+    file: 'apps/desktop/src/app/settings/appearance-settings.tsx',
+    from: '              <MinimizeToTraySetting />\n            </div>',
+    to: '              <MinimizeToTraySetting />\n              <StartAtLoginSetting />\n            </div>'
+  },
   // Bots list: the main bot (Spark) large on top (brand/files/.../spark-hero.tsx), the team below.
   {
     file: 'apps/desktop/src/plugins/hermes-bots/roster-pane.tsx',

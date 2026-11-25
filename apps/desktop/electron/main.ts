@@ -391,6 +391,7 @@ import { isMediaCapturePermission } from './media-capture-permission'
 import { createMediaProtocolHandler, MEDIA_PROTOCOL, mediaProtocolDownloadName } from './media-protocol'
 import { fetchLocalMedia } from './media-range'
 import { createMinimizeToTray } from './minimize-to-tray'
+import { createStartAtLogin } from './start-at-login'
 import {
   createNativeAccessTokenCoordinator,
   type NativeAccessTokenOptions,
@@ -11964,6 +11965,11 @@ const minimizeToTray = createMinimizeToTray({
   log: rememberLog
 })
 
+const startAtLogin = createStartAtLogin({
+  preferencesPath: path.join(app.getPath('userData'), 'start-at-login.json'),
+  log: rememberLog
+})
+
 function focusWindow(win) {
   if (!win || win.isDestroyed()) {
     return
@@ -17570,6 +17576,7 @@ app.whenReady().then(() => {
   registerPowerResumeListeners()
   keepAwake.restore()
   void minimizeToTray.start()
+  startAtLogin.start()
   mainProcessLagWatchdog.start()
   f12Blocked = readPersistedDisableF12()
   // Before the first profile read: a remembered local profile this HERMES_HOME

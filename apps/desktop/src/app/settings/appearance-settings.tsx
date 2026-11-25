@@ -82,6 +82,7 @@ import { ChatFontSetting } from './chat-font-setting'
 import { MODE_OPTIONS } from './constants'
 import { setNested } from './helpers'
 import { MinimizeToTraySetting } from './minimize-to-tray-setting'
+import { StartAtLoginSetting } from './start-at-login-setting'
 import { PetSettings } from './pet-settings'
 import { ListRow, RowFootnoteAction, SectionHeading, SettingsContent, ToggleRow } from './primitives'
 import { SETTING_IDS, settingElementId } from './settings-manifest'
@@ -787,6 +788,7 @@ export function AppearanceSettings({ subpage }: AppearanceSettingsProps = {}) {
           {show('window-layout') && (
             <div id={settingElementId(ids.minimizeToTray)}>
               <MinimizeToTraySetting />
+              <StartAtLoginSetting />
             </div>
           )}
 
