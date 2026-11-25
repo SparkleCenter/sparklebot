@@ -1068,14 +1068,8 @@ function GatewayConnectionSettings({ embedded, standalone }: { embedded: boolean
             onSelect={() => setState(current => ({ ...current, mode: 'local' }))}
             title={g.localTitle}
           />
-          <ModeCard
-            active={state.mode === 'cloud'}
-            description={g.cloudDesc}
-            disabled={state.envOverride}
-            icon={Cloud}
-            onSelect={() => setState(current => ({ ...current, mode: 'cloud' }))}
-            title={g.cloudTitle}
-          />
+          {/* Sparklebot: no Hermes Cloud hosting card; Sparkle hosts in the customer's own Azure. */}
+          {false && <ModeCard active={false} description={g.cloudDesc} icon={Cloud} onSelect={() => undefined} title={g.cloudTitle} />}
           <ModeCard
             active={state.mode === 'remote'}
             description={g.remoteDesc}

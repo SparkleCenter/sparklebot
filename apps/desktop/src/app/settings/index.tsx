@@ -451,14 +451,14 @@ export function SettingsView({ onClose, onConfigSaved, onMainModelChanged }: Set
             onSelect: () => setActiveView('about')
           }
         ] as OverlayNavGroup[]
-      ).map(group => {
+      ).filter(group => !["billing"].includes(String(group.id))).map(group => {
         const view = group.id as SettingsViewId
         const children = settingsSubpages(view)
 
         return children.length
           ? {
               ...group,
-              children: children.map(page => ({
+              children: children.filter(page => !["appearance:pet"].includes(`${view}:${page.id}`)).map(page => ({
                 active: group.active && subpage === page.id,
                 icon: settingsSubpageIcon(page, group.icon),
                 id: `${view}:${page.id}`,

@@ -215,6 +215,28 @@ const edits = [
     to: `...(isWindows ? [path.join(resourcesPath ?? '', '${p.kebab}.ico'), path.join(appRoot, 'assets', 'icon.ico')] : []),`
   },
   { file: 'scripts/install.ps1', from: "$iconIco = Join-Path $workDir 'resources\\icon.ico'", to: `$iconIco = Join-Path $workDir 'resources\\${p.kebab}.ico'` },
+  // Settings clean-up: hidden sections and sub-pages (brand/sparklebot.json settings), no pet tab,
+  // no Hermes Cloud hosting card (we host in the customer's own Azure).
+  {
+    file: 'apps/desktop/src/app/settings/index.tsx',
+    from: '        ] as OverlayNavGroup[]\n      ).map(group => {',
+    to: `        ] as OverlayNavGroup[]\n      ).filter(group => !${JSON.stringify(brand.settings.hidden)}.includes(String(group.id))).map(group => {`
+  },
+  {
+    file: 'apps/desktop/src/app/settings/index.tsx',
+    from: '              children: children.map(page => ({',
+    to: `              children: children.filter(page => !${JSON.stringify(brand.settings.hiddenSubpages)}.includes(\`\${view}:\${page.id}\`)).map(page => ({`
+  },
+  {
+    file: 'apps/desktop/src/plugins/hermes-bots/avatar-picker.tsx',
+    from: "          { id: 'upload', label: b.avatar.upload },\n          { id: 'pet', label: b.avatar.tabPet }",
+    to: "          { id: 'upload', label: b.avatar.upload } // Sparklebot: no pet tab"
+  },
+  {
+    file: 'apps/desktop/src/app/settings/gateway-settings.tsx',
+    from: "          <ModeCard\n            active={state.mode === 'cloud'}\n            description={g.cloudDesc}\n            disabled={state.envOverride}\n            icon={Cloud}\n            onSelect={() => setState(current => ({ ...current, mode: 'cloud' }))}\n            title={g.cloudTitle}\n          />",
+    to: "          {/* Sparklebot: no Hermes Cloud hosting card; Sparkle hosts in the customer's own Azure. */}\n          {false && <ModeCard active={false} description={g.cloudDesc} icon={Cloud} onSelect={() => undefined} title={g.cloudTitle} />}"
+  },
   // The installer's banner.
   {
     file: 'scripts/install.ps1',

@@ -127,8 +127,7 @@ export function AvatarPicker({ shape, color, image, onShape, onColor, onImage, g
         options={[
           { id: 'bot', label: b.avatar.tabBot },
           { id: 'generate', label: b.avatar.tabGenerate },
-          { id: 'upload', label: b.avatar.upload },
-          { id: 'pet', label: b.avatar.tabPet }
+          { id: 'upload', label: b.avatar.upload } // Sparklebot: no pet tab
         ]}
         value={tab}
       />

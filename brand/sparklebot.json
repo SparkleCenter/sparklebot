@@ -22,6 +22,11 @@
     "description": "Sparklebot, built on Hermes Agent by Nous Research (MIT licence)."
   },
   "repository": "https://github.com/SparkleCenter/sparklebot",
+  "settings": {
+    "_about": "Settings sections and sub-pages Sparklebot hides. Billing is Nous's subscription, not ours; the pet is replaced by the Sparks.",
+    "hidden": ["billing"],
+    "hiddenSubpages": ["appearance:pet"]
+  },
   "icons": {
     "source": "brand/source/sparkle-icon-512.png",
     "sourceOrigin": "C:/dev/sparkle-website/public/icon-512.png (copied 25.11.2026)"
