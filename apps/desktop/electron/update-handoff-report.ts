@@ -69,7 +69,7 @@ export function reportHandoffResult(host: HandoffReportHost): void {
       host.log(`[updates] detached update finished with warnings: ${result.warnings.join(' | ')}`)
       void host.dialog.showMessageBox({
         type: 'info',
-        title: 'Hermes update',
+        title: 'Sparklebot update',
         message: 'Hermes updated, but some follow-up steps need another try',
         detail: `${result.warnings.join('\n')}\n\nHermes retries them on the next launch or the next update.`
       })
@@ -82,7 +82,7 @@ export function reportHandoffResult(host: HandoffReportHost): void {
       host.log(`[updates] detached update finished with manual action (branch ${result.branch}): ${result.message}`)
       host.dialog.showMessageBox({
         type: 'warning',
-        title: 'Hermes update',
+        title: 'Sparklebot update',
         message: 'The update finished, but needs one more step',
         detail: result.message
       })
@@ -116,7 +116,7 @@ function reportFailedHandoff(host: HandoffReportHost, result: HandoffResult): vo
   void host.dialog
     .showMessageBox({
       type: 'error',
-      title: 'Hermes update',
+      title: 'Sparklebot update',
       message: explained?.message ?? "Hermes couldn't finish updating",
       detail:
         explained === null
@@ -164,7 +164,7 @@ function reportReleaseHolders(host: HandoffReportHost, holders: ReleaseHolder[],
   void host.dialog
     .showMessageBox({
       type: 'warning',
-      title: 'Hermes update',
+      title: 'Sparklebot update',
       message: `${names} is blocking the Desktop app update`,
       detail:
         `Hermes updated, but Windows would not replace the Desktop app because this program, which is not part of Hermes, is using its folder:\n\n${listed}\n\n` +

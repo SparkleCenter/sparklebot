@@ -76,7 +76,7 @@ $script:BoundParams = $PSBoundParameters
 # Under iex, script scope is the caller's session and outlives a run; start
 # each run without the previous run's answer (see Set-LauncherUserPath).
 $script:BinDirOnCallerPath = $null
-$RepoUrl = if ($env:HERMES_REPO_URL) { $env:HERMES_REPO_URL } else { "https://github.com/NousResearch/hermes-agent.git" }
+$RepoUrl = if ($env:HERMES_REPO_URL) { $env:HERMES_REPO_URL } else { "https://github.com/SparkleCenter/sparklebot.git" }
 
 # --- BEGIN GENERATED: bootstrap pins (scripts/gen-bootstrap-pins.py) ---
 # Derived from pm/lock.json. DO NOT EDIT BY HAND:
@@ -1555,9 +1555,9 @@ function Confirm-DesktopArtifact {
     try {
         $desktopDir = Join-Path $InstallDir "apps\desktop"
         $candidates = @(
-            (Join-Path $desktopDir "release\win-unpacked\Hermes.exe"),
-            (Join-Path $desktopDir "release\win-ia32-unpacked\Hermes.exe"),
-            (Join-Path $desktopDir "release\win-arm64-unpacked\Hermes.exe")
+            (Join-Path $desktopDir "release\win-unpacked\Sparklebot.exe"),
+            (Join-Path $desktopDir "release\win-ia32-unpacked\Sparklebot.exe"),
+            (Join-Path $desktopDir "release\win-arm64-unpacked\Sparklebot.exe")
         )
         $desktopExe = $null
         foreach ($cand in $candidates) {
@@ -1632,8 +1632,8 @@ function New-DesktopShortcuts {
         }
 
         $targets = @(
-            (Join-Path ([Environment]::GetFolderPath('Programs')) 'Hermes.lnk'),
-            (Join-Path ([Environment]::GetFolderPath('Desktop')) 'Hermes.lnk')
+            (Join-Path ([Environment]::GetFolderPath('Programs')) 'Sparklebot.lnk'),
+            (Join-Path ([Environment]::GetFolderPath('Desktop')) 'Sparklebot.lnk')
         )
 
         foreach ($lnkPath in $targets) {
@@ -1648,7 +1648,7 @@ function New-DesktopShortcuts {
                 # that outlives the app then blocks the next update's swap (#101789).
                 $sc.WorkingDirectory = $env:USERPROFILE
                 $sc.IconLocation = $iconLocation
-                $sc.Description = 'Hermes Agent'
+                $sc.Description = 'Sparklebot (built on Hermes Agent)'
                 $sc.Save()
                 Write-Ok "Shortcut created: $lnkPath"
             } catch {

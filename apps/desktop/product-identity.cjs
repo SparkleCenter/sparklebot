@@ -9,16 +9,16 @@
 'use strict'
 
 const variants = {
-  '': { display: 'Hermes', kebab: 'hermes', pascal: 'Hermes' },
+  '': { display: 'Sparklebot', kebab: 'sparklebot', pascal: 'Sparklebot' },
   light: {
-    display: 'Hermes Light',
-    kebab: 'hermes-light',
-    pascal: 'HermesLight'
+    display: 'Sparklebot Light',
+    kebab: 'sparklebot-light',
+    pascal: 'SparklebotLight'
   },
   bundled: {
-    display: 'Hermes Agent',
-    kebab: 'hermes-bundled',
-    pascal: 'HermesBundled'
+    display: 'Sparklebot',
+    kebab: 'sparklebot-bundled',
+    pascal: 'SparklebotBundled'
   }
 }
 
@@ -32,6 +32,7 @@ if (!['', 'light', 'bundled', 'store'].includes(variant)) {
 // userData + single-instance lock with the out-of-store install), different
 // MSIX package identity. The Store re-signs on submission.
 const store = variant === 'store'
+if (store) throw new Error('Sparklebot has no Microsoft Store identity yet (brand/apply.mjs)')
 const light = variant === 'light'
 const name = variants[store ? 'bundled' : (variant || '')]
 
@@ -66,14 +67,14 @@ const identity = {
   store,
   light,
   displayName,
-  appId: `com.nousresearch.${name.kebab}${kebabSuffix}`,
+  appId: `ee.sparklesolutions.${name.kebab}${kebabSuffix}`,
   // Store and commit builds do not publish a release feed.
   channel: store || buildCommit ? null : light ? (canary ? 'light-canary' : 'light') : (canary ? 'canary' : 'latest'),
   appNamePascal: `${name.pascal}${pascalSuffix}`,
   artifactNamePascal: name.pascal,
   windowsExecutableName: kebabSuffix ? cliName : displayName,
   cliName,
-  msixAppIdWithOrg: `NousResearch.${name.pascal}${pascalSuffix}`,
+  msixAppIdWithOrg: `SparkleSolutions.${name.pascal}${pascalSuffix}`,
   ...(store
     ? {
         storeMsix: {

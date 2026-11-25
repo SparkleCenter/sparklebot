@@ -18,7 +18,7 @@ from agent.onboarding_flow import Facts, next_beat
 from tools.set_theme_tool import ACCENT_SWATCHES
 
 CHAT_TITLE = "Getting started"
-GREETING = "Hi, I'm Hermes. Let's set things up for you. Then we'll get something cool done."
+GREETING = "Hi, I'm Sparklebot. Let's set things up for you. Then we'll get something cool done."
 
 # The scripted opening in each desktop UI language (apps/desktop/src/i18n/languages.ts), played before
 # the model speaks; the model writes the rest of the run in the user's language itself. Each greeting
@@ -116,7 +116,7 @@ def facts_block(facts: Facts) -> str:
 def opening_prompt(facts: Facts) -> str:
     """The hidden first turn of the onboarding chat: every rule of the run."""
     dimensions = "\n".join(f"- {name}: {buckets}" for name, buckets in PROFILE_DIMENSIONS)
-    return f"""[System note: This is the user's first time opening the Hermes desktop app. You run their first-run onboarding in this chat. The beats, in order: their name, the theme (accent colour; light or dark only if they ask), the layout, connectors, plugins, a tour, then the first thing you build for them.
+    return f"""[System note: This is the user's first time opening the Sparklebot desktop app. You run their first-run onboarding in this chat. The beats, in order: their name, the theme (accent colour; light or dark only if they ask), the layout, connectors, plugins, a tour, then the first thing you build for them.
 
 How it works:
 - setup_beat shows a beat's card and waits for the user. setup_beat(beat="next") shows the next beat. Its result carries their answer and a reminder of what to do next. Follow the reminder.

@@ -1,0 +1,29 @@
+{
+  "_about": "Sparklebot brand values. brand/apply.mjs writes these into a clean Hermes Agent checkout. Change here, never in the patched files.",
+  "upstream": {
+    "project": "Hermes Agent by Nous Research (MIT licence)",
+    "repository": "https://github.com/NousResearch/hermes-agent",
+    "tag": "v0.23.2",
+    "commit": "ae2a81ccc00e9b7c06301523e5bb09608397149c"
+  },
+  "product": {
+    "display": "Sparklebot",
+    "kebab": "sparklebot",
+    "pascal": "Sparklebot",
+    "lightDisplay": "Sparklebot Light",
+    "lightKebab": "sparklebot-light",
+    "lightPascal": "SparklebotLight",
+    "bundledDisplay": "Sparklebot",
+    "bundledKebab": "sparklebot-bundled",
+    "bundledPascal": "SparklebotBundled",
+    "appIdPrefix": "ee.sparklesolutions.",
+    "msixOrgPrefix": "SparkleSolutions.",
+    "author": "SparkleSolutions OÜ",
+    "description": "Sparklebot, built on Hermes Agent by Nous Research (MIT licence)."
+  },
+  "repository": "https://github.com/SparkleCenter/sparklebot",
+  "icons": {
+    "source": "brand/source/sparkle-icon-512.png",
+    "sourceOrigin": "C:/dev/sparkle-website/public/icon-512.png (copied 25.11.2026)"
+  }
+}

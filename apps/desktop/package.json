@@ -1,10 +1,10 @@
 {
   "name": "hermes",
-  "productName": "Hermes",
+  "productName": "Sparklebot",
   "private": true,
   "version": "0.0.0",
-  "description": "Native desktop shell for Hermes Agent.",
-  "author": "Nous Research",
+  "description": "Sparklebot, built on Hermes Agent by Nous Research (MIT licence).",
+  "author": "SparkleSolutions OÜ",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/NousResearch/hermes-agent.git"
