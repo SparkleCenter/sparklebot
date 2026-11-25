@@ -35,7 +35,7 @@ param(
     # wrappers written against the old switch keep binding (#125350).
     [switch]$SkipSetup,
     [switch]$Json,
-    [switch]$IncludeDesktop,
+    [switch]$IncludeDesktop = $true,
     # Same opt-out as install.sh --skip-browser: PM records it, so later
     # installs and `hermes update` keep the browser off until
     # `hermes pm install chromium` opts back in.
