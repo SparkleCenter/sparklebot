@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="New bot"><title>New bot</title>
+  <path d="M100 24 C150 22 180 58 178 104 C176 150 142 178 98 176 C52 174 22 146 24 100 C26 56 54 26 100 24 Z" fill="#E9C9A6" stroke="#A9825C" stroke-width="5"/>
+  <g class="face">
+    <ellipse cx="70" cy="86" rx="11" ry="13" fill="#FFFDF9" stroke="#3A2615" stroke-width="3"/>
+    <ellipse cx="120" cy="86" rx="11" ry="13" fill="#FFFDF9" stroke="#3A2615" stroke-width="3"/>
+    <circle class="pupil" cx="73" cy="89" r="5" fill="#3A2615"/>
+    <circle class="pupil" cx="123" cy="89" r="5" fill="#3A2615"/>
+    <path d="M 97 80 q -9 18 0 22 q 4 2 9 -2 M 72 116 q 14 10 30 -2" fill="none" stroke="#3A2615" stroke-width="3" stroke-linecap="round"/>
+  </g>
+</svg>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Social"><title>Social</title>
+  <path d="M100 22 C152 22 182 50 182 90 C182 130 150 156 104 156 C92 156 82 155 72 152 L38 176 Q30 181 33 171 L42 142 C26 130 18 112 18 90 C18 50 48 22 100 22 Z" fill="#F2775A" stroke="#B4472F" stroke-width="5" stroke-linejoin="round"/>
+  <g class="face">
+    <ellipse cx="70" cy="78" rx="11" ry="13" fill="#FFFDF9" stroke="#3A2615" stroke-width="3"/>
+    <ellipse cx="120" cy="78" rx="11" ry="13" fill="#FFFDF9" stroke="#3A2615" stroke-width="3"/>
+    <circle class="pupil" cx="73" cy="81" r="5" fill="#3A2615"/>
+    <circle class="pupil" cx="123" cy="81" r="5" fill="#3A2615"/>
+    <path d="M 97 72 q -9 18 0 22 q 4 2 9 -2 M 72 108 q 14 10 30 -2" fill="none" stroke="#3A2615" stroke-width="3" stroke-linecap="round"/>
+  </g>
+</svg>

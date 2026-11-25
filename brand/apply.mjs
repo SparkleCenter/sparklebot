@@ -19,6 +19,15 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const checkOnly = process.argv.includes('--check')
 const brand = JSON.parse(readFileSync(path.join(root, 'brand/sparklebot.json'), 'utf8'))
 const p = brand.product
+const theme = JSON.parse(readFileSync(path.join(root, 'brand/theme.json'), 'utf8'))
+const paletteTs = colors => Object.entries(colors).map(([k, v]) => `      ${k}: '${v}'`).join(',\n')
+const themePaletteBlock =
+  `  ${theme.name}: {\n    colors: {\n${paletteTs(theme.colors)}\n    },\n    darkColors: {\n${paletteTs(theme.darkColors)}\n    }\n  },\n`
+const themePresetBlock =
+  `/** ${theme.label}: Sparklebot's default skin (brand/theme.json). */\n` +
+  `export const ${theme.name}Theme: DesktopTheme = {\n  name: '${theme.name}',\n  label: '${theme.label}',\n` +
+  `  description: '${theme.description}',\n  ...THEME_PRESET_PALETTES.${theme.name},\n` +
+  `  typography: { fontSans: SYSTEM_SANS, fontMono: SYSTEM_MONO }\n}\n\n`
 
 /** Each edit: file, the exact Hermes text, and our text. */
 const edits = [
@@ -122,6 +131,20 @@ const edits = [
     from: 'release_dir / d / "Hermes.exe" for d in ("win-unpacked", "win-ia32-unpacked", "win-arm64-unpacked")',
     to: `release_dir / d / "${p.display}.exe" for d in ("win-unpacked", "win-ia32-unpacked", "win-arm64-unpacked")`
   },
+  // The warm Sparkle theme: its palette, its preset, first in the list and the default skin.
+  {
+    file: 'apps/shared/src/theme-presets.ts',
+    from: "  ember: {\n    colors: {\n      background: '#160800',",
+    to: themePaletteBlock + "  ember: {\n    colors: {\n      background: '#160800',"
+  },
+  { file: 'apps/desktop/src/themes/presets.ts', from: 'export const emberTheme: DesktopTheme = {', to: themePresetBlock + 'export const emberTheme: DesktopTheme = {' },
+  {
+    file: 'apps/desktop/src/themes/presets.ts',
+    from: 'export const BUILTIN_THEMES: Record<string, DesktopTheme> = {\n  nous: nousTheme,',
+    to: `export const BUILTIN_THEMES: Record<string, DesktopTheme> = {\n  ${theme.name}: ${theme.name}Theme,\n  nous: nousTheme,`
+  },
+  { file: 'apps/desktop/src/themes/presets.ts', from: "export const DEFAULT_SKIN_NAME = 'nous'", to: `export const DEFAULT_SKIN_NAME = '${theme.name}'` },
+  { file: 'apps/desktop/src/themes/use-skin-command.ts', from: "  default: 'nous',", to: `  default: '${theme.name}',` },
   // The big lettering on an empty chat, and two titles that name the product as "Hermes Agent".
   { file: 'apps/desktop/src/components/chat/intro.tsx', from: "const WORDMARK = 'HERMES AGENT'", to: `const WORDMARK = '${p.display.toUpperCase()}'` },
   { file: 'apps/desktop/src/i18n/en.ts', from: "settingUpTitle: 'Setting up Hermes Agent',", to: `settingUpTitle: 'Setting up ${p.display}',` },

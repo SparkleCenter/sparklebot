@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Events"><title>Events</title>
+  <polygon points="100.0,12.0 118.1,32.4 144.0,23.8 149.5,50.5 176.2,56.0 167.6,81.9 188.0,100.0 167.6,118.1 176.2,144.0 149.5,149.5 144.0,176.2 118.1,167.6 100.0,188.0 81.9,167.6 56.0,176.2 50.5,149.5 23.8,144.0 32.4,118.1 12.0,100.0 32.4,81.9 23.8,56.0 50.5,50.5 56.0,23.8 81.9,32.4 " fill="#FFCB3D" stroke="#C08A0C" stroke-width="5" stroke-linejoin="round"/>
+  <g class="face">
+    <ellipse cx="78" cy="88" rx="11" ry="13" fill="#FFFDF9" stroke="#3A2615" stroke-width="3"/>
+    <ellipse cx="124" cy="88" rx="11" ry="13" fill="#FFFDF9" stroke="#3A2615" stroke-width="3"/>
+    <circle class="pupil" cx="81" cy="91" r="5" fill="#3A2615"/>
+    <circle class="pupil" cx="127" cy="91" r="5" fill="#3A2615"/>
+    <path d="M 103 82 q -8 16 0 20 q 4 2 8 -2 M 82 120 q 20 14 40 -2" fill="none" stroke="#3A2615" stroke-width="3" stroke-linecap="round"/>
+  </g>
+</svg>

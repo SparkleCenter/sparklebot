@@ -399,6 +399,15 @@ export const midnightTheme: DesktopTheme = {
   }
 }
 
+/** Sparkle: Sparklebot's default skin (brand/theme.json). */
+export const sparkleTheme: DesktopTheme = {
+  name: 'sparkle',
+  label: 'Sparkle',
+  description: 'Warm paper, roast brown and Sparkle orange',
+  ...THEME_PRESET_PALETTES.sparkle,
+  typography: { fontSans: SYSTEM_SANS, fontMono: SYSTEM_MONO }
+}
+
 export const emberTheme: DesktopTheme = {
   name: 'ember',
   label: 'Ember',
@@ -442,6 +451,7 @@ export const slateTheme: DesktopTheme = {
 }
 
 export const BUILTIN_THEMES: Record<string, DesktopTheme> = {
+  sparkle: sparkleTheme,
   nous: nousTheme,
   github: githubTheme,
   catppuccin: catppuccinTheme,
@@ -459,7 +469,7 @@ export const BUILTIN_THEMES: Record<string, DesktopTheme> = {
 export const BUILTIN_THEME_LIST = Object.values(BUILTIN_THEMES)
 
 /** Skin used when nothing is persisted or the persisted name is retired. */
-export const DEFAULT_SKIN_NAME = 'nous'
+export const DEFAULT_SKIN_NAME = 'sparkle'
 
 /** Names that no longer resolve to a skin of their own. A stored pick of one
  *  falls back to DEFAULT_SKIN_NAME, and a cached backend theme under one is

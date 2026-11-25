@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Scout"><title>Scout</title>
+  <path d="M100 18 Q108 18 113 27 L182 160 Q187 172 174 174 L26 174 Q13 172 18 160 L87 27 Q92 18 100 18 Z" fill="#F5B83D" stroke="#B27A12" stroke-width="5" stroke-linejoin="round"/>
+  <g class="face">
+    <ellipse cx="72" cy="104" rx="11" ry="13" fill="#FFFDF9" stroke="#3A2615" stroke-width="3"/>
+    <ellipse cx="118" cy="104" rx="11" ry="13" fill="#FFFDF9" stroke="#3A2615" stroke-width="3"/>
+    <circle class="pupil" cx="75" cy="107" r="5" fill="#3A2615"/>
+    <circle class="pupil" cx="121" cy="107" r="5" fill="#3A2615"/>
+    <path d="M 97 98 q -9 18 0 22 q 4 2 9 -2 M 74 134 q 14 10 30 -2" fill="none" stroke="#3A2615" stroke-width="3" stroke-linecap="round"/>
+  </g>
+</svg>

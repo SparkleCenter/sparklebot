@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Spark"><title>Spark</title>
+  <path d="M128 10 Q136 6 133 16 L114 80 L160 80 Q174 81 165 93 L80 188 Q70 197 73 185 L92 120 L44 120 Q30 119 39 107 Z" fill="#F39200" stroke="#B86E00" stroke-width="5" stroke-linejoin="round"/>
+  <g class="face">
+    <ellipse cx="86" cy="96" rx="11" ry="13" fill="#FFFDF9" stroke="#3A2615" stroke-width="3"/>
+    <ellipse cx="118" cy="96" rx="11" ry="13" fill="#FFFDF9" stroke="#3A2615" stroke-width="3"/>
+    <circle class="pupil" cx="89" cy="99" r="5" fill="#3A2615"/>
+    <circle class="pupil" cx="121" cy="99" r="5" fill="#3A2615"/>
+    <path d="M 104 90 q -8 16 0 20 q 4 2 8 -2 M 90 124 q 12 8 24 -2" fill="none" stroke="#3A2615" stroke-width="3" stroke-linecap="round"/>
+  </g>
+</svg>
