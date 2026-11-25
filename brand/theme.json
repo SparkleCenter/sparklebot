@@ -3,6 +3,15 @@
   "name": "sparkle",
   "label": "Sparkle",
   "description": "Warm paper, roast brown and Sparkle orange",
+  "avatarColors": ["#F39200", "#F2B33D", "#FFC93C", "#F07258", "#D9542B", "#C08A5B", "#8B5E3C", "#E8C8A4", "#8FB38A", "#5E9C8C", "#A0607A", "#F4A6A0"],
+  "avatarShapes": {
+    "_about": "Bot avatars. The main bot is Spark; known bots get their character; new bots start as the pebble. Picker order: Sparks first, Hermes's shapes after.",
+    "primary": { "shape": "spark", "color": "#F39200" },
+    "named": { "spark": "spark", "scout": "triangle", "social": "bubble", "events": "sun" },
+    "newBot": "pebble",
+    "pool": ["spark", "bubble", "sun", "pebble", "triangle", "star", "cookie", "drop", "cloud"],
+    "picker": ["spark", "bubble", "sun", "pebble", "triangle", "star", "cookie", "cloud", "drop", "circle", "blob", "squircle", "hexagon"]
+  },
   "colors": {
     "background": "#FFF9F2",
     "foreground": "#2A1F16",

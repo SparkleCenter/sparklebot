@@ -5,6 +5,8 @@
 
 const PROFILE_TAG_SATURATION = 68
 const PROFILE_TAG_LIGHTNESS = 58
+/** Sparklebot's warm identity palette (brand/theme.json avatarColors). */
+const SPARKLE_WARM: readonly string[] = ["#F39200","#F2B33D","#FFC93C","#F07258","#D9542B","#C08A5B","#8B5E3C","#E8C8A4","#8FB38A","#5E9C8C","#A0607A","#F4A6A0"]
 
 function hashString(value: string): number {
   let hash = 0
@@ -25,9 +27,7 @@ export function profileColor(name: null | string | undefined): null | string {
     return null
   }
 
-  const hue = hashString(key) % 360
-
-  return `hsl(${hue} ${PROFILE_TAG_SATURATION}% ${PROFILE_TAG_LIGHTNESS}%)`
+  return SPARKLE_WARM[hashString(key) % SPARKLE_WARM.length]
 }
 
 // A profile's effective color: a user-picked override wins, else the
@@ -44,10 +44,7 @@ export function resolveProfileColor(name: null | string | undefined, overrides: 
 
 // Curated swatches for the rail color picker — evenly spaced hues at the same
 // saturation/lightness as the deterministic palette, so picks stay cohesive.
-export const PROFILE_SWATCHES: readonly string[] = Array.from(
-  { length: 12 },
-  (_, index) => `hsl(${index * 30} ${PROFILE_TAG_SATURATION}% ${PROFILE_TAG_LIGHTNESS}%)`
-)
+export const PROFILE_SWATCHES: readonly string[] = SPARKLE_WARM
 
 // Translucent fill derived from a profile color, for tag backgrounds.
 export function profileColorSoft(color: string, percent = 16): string {

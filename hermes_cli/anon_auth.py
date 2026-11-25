@@ -162,8 +162,8 @@ def guest_allowed() -> bool:
         logger.debug("guest: config unreadable, treating nous.guest as false", exc_info=True)
         return False
     if not isinstance(nous_cfg, dict):
-        return True
-    return bool(nous_cfg.get("guest", True))
+        return False  # Sparklebot: Nous guests are opt-in
+    return bool(nous_cfg.get("guest", False))
 
 
 def is_guest_state(state: Any) -> bool:

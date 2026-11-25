@@ -23,8 +23,10 @@ const createBudgetedLoop = typeof sdk === 'undefined' ? undefined : sdk.createBu
 // The original flat shapes. Sigils ('sigil-N') and platonic
 // solids remain render-only so any bot that picked one during the experiments
 // keeps its look.
-const AVATAR_SHAPES: AvatarShape[] = ['circle', 'squircle', 'pill', 'triangle', 'hexagon', 'cloud', 'drop']
-export const AVATAR_PICKER_SHAPES = ['circle', 'blob', 'squircle', 'pill', 'triangle', 'hexagon', 'cloud', 'drop']
+const AVATAR_SHAPES: AvatarShape[] = ['spark', 'bubble', 'sun', 'pebble', 'triangle', 'star', 'cookie', 'drop', 'cloud'] as AvatarShape[]
+export const AVATAR_PICKER_SHAPES = ['spark', 'bubble', 'sun', 'pebble', 'triangle', 'star', 'cookie', 'cloud', 'drop', 'circle', 'blob', 'squircle', 'hexagon']
+/** Sparklebot: known bots wear their character. */
+const NAMED_SHAPES: Record<string, string> = {"spark":"spark","scout":"triangle","social":"bubble","events":"sun"}
 
 /** xorshift PRNG seeded from a string — stable across sessions/platforms. */
 function sigilRng(text: string) {
@@ -105,6 +107,12 @@ function isDarkColor(hex: string) {
 }
 
 export function defaultShapeFor(name: string): AvatarShape {
+  const named = NAMED_SHAPES[(name || '').trim().toLowerCase()]
+
+  if (named) {
+    return named as AvatarShape
+  }
+
   let hash = 0
 
   for (const ch of name) {
@@ -554,6 +562,22 @@ function sampleFaceRing(shape: null | string | undefined, steps = 52): FacePoint
       const p = 3.1
       const d = Math.pow(Math.abs(c) ** p + Math.abs(s) ** p, 1 / p) || 1
       rx = ry = 16 / d
+    } else if (kind === 'spark') {
+      // Sparkle: four points, two long diagonal arms (up-right, down-left), like the Sparkle mark.
+      const arm = (x: number, p: number) => Math.max(0, x) ** p
+      rx = ry = 8.8 + 9.6 * arm(Math.cos(a + Math.PI / 3), 22) + 9.6 * arm(Math.cos(a - (2 * Math.PI) / 3), 22) +
+        5.6 * arm(Math.cos(a - Math.PI / 6), 26) + 5.6 * arm(Math.cos(a - (7 * Math.PI) / 6), 26)
+    } else if (kind === 'bubble') {
+      // Speech bubble with a tail down-left.
+      const tail = 7 * Math.max(0, Math.cos(a - (3 * Math.PI) / 4)) ** 40
+      rx = 16.6 + tail
+      ry = 14.4 + tail
+    } else if (kind === 'sun') {
+      rx = ry = 14.8 + 2.4 * Math.cos(10 * a)
+    } else if (kind === 'star') {
+      rx = ry = 12.5 + 5 * Math.cos(5 * (a + Math.PI / 2))
+    } else if (kind === 'cookie') {
+      rx = ry = 15.6 + 0.9 * Math.sin(9 * a) + 0.5 * Math.cos(4 * a)
     } else if (kind === 'pebble') {
       rx = 16.4 * (1.04 - 0.14 * Math.cos(2 * a))
       ry = 15.2 * (1.06 + 0.08 * Math.sin(2 * a))
@@ -1101,6 +1125,9 @@ export function BotFace({ shape, color, image, size = 36, name = 'agent', mood =
         }
         data-hb-body="1"
         fill={color}
+        stroke="rgba(42,31,22,0.78)"
+        strokeLinejoin="round"
+        strokeWidth={1.15}
       />
       <g data-hb-open="1">
         <ellipse cx={15.4} cy={eyeY0} data-hb-el="1" fill={eyeFill} rx={2.2} ry={working ? 2.6 : 2.3} />
@@ -1128,7 +1155,7 @@ export function BotFace({ shape, color, image, size = 36, name = 'agent', mood =
 
 /** The friendly violet the primary profile has always worn, and the last
  *  resort for a draft that has no name to derive a hue from yet. */
-const PRIMARY_AVATAR_COLOR = '#8b5cf6'
+const PRIMARY_AVATAR_COLOR = '#F39200'
 
 /** A picked color wins; with none, fall back to the name's deterministic hue —
  *  the same one `botAppearance` seeds — so "no choice" means the app's color
@@ -1149,7 +1176,7 @@ export function botAppearance(name: string, meta: BotMeta | null | undefined): A
 
   if (isPrimary && !userCustomized) {
     return {
-      shape: 'squircle',
+      shape: 'spark',
       color: PRIMARY_AVATAR_COLOR,
       image: meta?.image || null
     }

@@ -29,6 +29,87 @@ const themePresetBlock =
   `  description: '${theme.description}',\n  ...THEME_PRESET_PALETTES.${theme.name},\n` +
   `  typography: { fontSans: SYSTEM_SANS, fontMono: SYSTEM_MONO }\n}\n\n`
 
+/** The avatar layer, from brand/theme.json (avatarColors, avatarShapes). */
+function avatarEdits() {
+  const av = theme.avatarShapes
+  const AV = 'apps/desktop/src/plugins/hermes-bots/avatar.tsx'
+  const list = xs => xs.map(x => `'${x}'`).join(', ')
+  // New outline rings in Hermes's polar form: radius by angle around (20,20); eyes sit at r≈5.4.
+  const rings = [
+    "    } else if (kind === 'spark') {",
+    '      // Sparkle: four points, two long diagonal arms (up-right, down-left), like the Sparkle mark.',
+    '      const arm = (x: number, p: number) => Math.max(0, x) ** p',
+    '      rx = ry = 8.8 + 9.6 * arm(Math.cos(a + Math.PI / 3), 22) + 9.6 * arm(Math.cos(a - (2 * Math.PI) / 3), 22) +',
+    '        5.6 * arm(Math.cos(a - Math.PI / 6), 26) + 5.6 * arm(Math.cos(a - (7 * Math.PI) / 6), 26)',
+    "    } else if (kind === 'bubble') {",
+    '      // Speech bubble with a tail down-left.',
+    '      const tail = 7 * Math.max(0, Math.cos(a - (3 * Math.PI) / 4)) ** 40',
+    '      rx = 16.6 + tail',
+    '      ry = 14.4 + tail',
+    "    } else if (kind === 'sun') {",
+    '      rx = ry = 14.8 + 2.4 * Math.cos(10 * a)',
+    "    } else if (kind === 'star') {",
+    '      rx = ry = 12.5 + 5 * Math.cos(5 * (a + Math.PI / 2))',
+    "    } else if (kind === 'cookie') {",
+    '      rx = ry = 15.6 + 0.9 * Math.sin(9 * a) + 0.5 * Math.cos(4 * a)',
+    "    } else if (kind === 'pebble') {"
+  ].join('\n')
+  return [
+    {
+      file: AV,
+      from: "const AVATAR_SHAPES: AvatarShape[] = ['circle', 'squircle', 'pill', 'triangle', 'hexagon', 'cloud', 'drop']\nexport const AVATAR_PICKER_SHAPES = ['circle', 'blob', 'squircle', 'pill', 'triangle', 'hexagon', 'cloud', 'drop']",
+      to: `const AVATAR_SHAPES: AvatarShape[] = [${list(av.pool)}] as AvatarShape[]\nexport const AVATAR_PICKER_SHAPES = [${list(av.picker)}]\n/** Sparklebot: known bots wear their character. */\nconst NAMED_SHAPES: Record<string, string> = ${JSON.stringify(av.named)}`
+    },
+    {
+      file: AV,
+      from: 'export function defaultShapeFor(name: string): AvatarShape {\n  let hash = 0',
+      to: 'export function defaultShapeFor(name: string): AvatarShape {\n  const named = NAMED_SHAPES[(name || \'\').trim().toLowerCase()]\n\n  if (named) {\n    return named as AvatarShape\n  }\n\n  let hash = 0'
+    },
+    { file: AV, from: "    } else if (kind === 'pebble') {", to: rings },
+    { file: AV, from: "const PRIMARY_AVATAR_COLOR = '#8b5cf6'", to: `const PRIMARY_AVATAR_COLOR = '${av.primary.color}'` },
+    { file: AV, from: "      shape: 'squircle',\n      color: PRIMARY_AVATAR_COLOR,", to: `      shape: '${av.primary.shape}',\n      color: PRIMARY_AVATAR_COLOR,` },
+    {
+      // A thin ink line around every face body, for the hand-drawn Sparks look.
+      file: AV,
+      from: '        data-hb-body="1"\n        fill={color}\n      />',
+      to: '        data-hb-body="1"\n        fill={color}\n        stroke="rgba(42,31,22,0.78)"\n        strokeLinejoin="round"\n        strokeWidth={1.15}\n      />'
+    },
+    {
+      // New bots start as the pebble, and the name-driven blob library (its own palette) moves last.
+      file: 'apps/desktop/src/plugins/hermes-bots/create-dialog.tsx',
+      all: true,
+      from: "setShape(blobatarSvg ? 'blobatar' : 'circle')",
+      to: `setShape('${av.newBot}')`
+    },
+    {
+      file: 'apps/desktop/src/plugins/hermes-bots/create-dialog.tsx',
+      from: "useState(blobatarSvg ? 'blobatar' : 'circle')",
+      to: `useState('${av.newBot}')`
+    },
+    {
+      file: 'apps/desktop/src/plugins/hermes-bots/avatar-picker.tsx',
+      from: "{(blobatarSvg ? ['blobatar', ...AVATAR_PICKER_SHAPES] : AVATAR_PICKER_SHAPES).map(s => (",
+      to: "{(blobatarSvg ? [...AVATAR_PICKER_SHAPES, 'blobatar'] : AVATAR_PICKER_SHAPES).map(s => ("
+    },
+    {
+      // Identity colours everywhere (bots, profile tags, projects, badges): the warm palette.
+      file: 'apps/desktop/src/lib/profile-color.ts',
+      from: 'const PROFILE_TAG_LIGHTNESS = 58\n',
+      to: `const PROFILE_TAG_LIGHTNESS = 58\n/** Sparklebot's warm identity palette (brand/theme.json avatarColors). */\nconst SPARKLE_WARM: readonly string[] = ${JSON.stringify(theme.avatarColors)}\n`
+    },
+    {
+      file: 'apps/desktop/src/lib/profile-color.ts',
+      from: '  const hue = hashString(key) % 360\n\n  return `hsl(${hue} ${PROFILE_TAG_SATURATION}% ${PROFILE_TAG_LIGHTNESS}%)`',
+      to: '  return SPARKLE_WARM[hashString(key) % SPARKLE_WARM.length]'
+    },
+    {
+      file: 'apps/desktop/src/lib/profile-color.ts',
+      from: 'export const PROFILE_SWATCHES: readonly string[] = Array.from(\n  { length: 12 },\n  (_, index) => `hsl(${index * 30} ${PROFILE_TAG_SATURATION}% ${PROFILE_TAG_LIGHTNESS}%)`\n)',
+      to: 'export const PROFILE_SWATCHES: readonly string[] = SPARKLE_WARM'
+    }
+  ]
+}
+
 /** Each edit: file, the exact Hermes text, and our text. */
 const edits = [
   {
@@ -116,6 +197,24 @@ const edits = [
   { file: 'scripts/install.ps1', all: true, from: '-unpacked\\Hermes.exe"),', to: `-unpacked\\${p.display}.exe"),` },
   { file: 'scripts/install.ps1', from: '(Join-Path $desktopDir "release\\win-arm64-unpacked\\Hermes.exe")', to: `(Join-Path $desktopDir "release\\win-arm64-unpacked\\${p.display}.exe")` },
   { file: 'scripts/install.ps1', all: true, from: "'Hermes.lnk')", to: `'${p.display}.lnk')` },
+  // No Nous by default: no anonymous Nous account, no Nous free trial, no Nous connector guest.
+  // `nous.guest: true` in config.yaml still turns it on. Without it, web search uses a Brave key
+  // when one is set, else Hermes's keyless free services; the Nous status item hides itself.
+  {
+    file: 'hermes_cli/anon_auth.py',
+    from: '    if not isinstance(nous_cfg, dict):\n        return True\n    return bool(nous_cfg.get("guest", True))',
+    to: '    if not isinstance(nous_cfg, dict):\n        return False  # Sparklebot: Nous guests are opt-in\n    return bool(nous_cfg.get("guest", False))'
+  },
+  // The app icon ships as sparklebot.ico. Windows caches shortcut icons by file path, and
+  // resources\icon.ico is the path Hermes's own shortcut used, so a PC that had Hermes kept
+  // showing the old picture. A new name forces Windows to read the Sparkle icon.
+  { file: 'apps/desktop/electron-builder.config.cjs', from: "      to: 'icon.ico'", to: `      to: '${p.kebab}.ico'` },
+  {
+    file: 'apps/desktop/electron/app-icon.ts',
+    from: "...(isWindows ? [path.join(resourcesPath ?? '', 'icon.ico'), path.join(appRoot, 'assets', 'icon.ico')] : []),",
+    to: `...(isWindows ? [path.join(resourcesPath ?? '', '${p.kebab}.ico'), path.join(appRoot, 'assets', 'icon.ico')] : []),`
+  },
+  { file: 'scripts/install.ps1', from: "$iconIco = Join-Path $workDir 'resources\\icon.ico'", to: `$iconIco = Join-Path $workDir 'resources\\${p.kebab}.ico'` },
   // The installer's banner.
   {
     file: 'scripts/install.ps1',
@@ -156,6 +255,8 @@ const edits = [
   },
   { file: 'apps/desktop/src/themes/presets.ts', from: "export const DEFAULT_SKIN_NAME = 'nous'", to: `export const DEFAULT_SKIN_NAME = '${theme.name}'` },
   { file: 'apps/desktop/src/themes/use-skin-command.ts', from: "  default: 'nous',", to: `  default: '${theme.name}',` },
+  // Avatars: the Sparks as live-face shapes, warm identity colours, Spark as the main bot's look.
+  ...avatarEdits(),
   // The big lettering on an empty chat, and two titles that name the product as "Hermes Agent".
   { file: 'apps/desktop/src/components/chat/intro.tsx', from: "const WORDMARK = 'HERMES AGENT'", to: `const WORDMARK = '${p.display.toUpperCase()}'` },
   { file: 'apps/desktop/src/i18n/en.ts', from: "settingUpTitle: 'Setting up Hermes Agent',", to: `settingUpTitle: 'Setting up ${p.display}',` },

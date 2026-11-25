@@ -1624,7 +1624,7 @@ function New-DesktopShortcuts {
         # extracted from the exe at shortcut-creation time, and that cached
         # bitmap can persist (showing the OLD/Electron icon) even after the exe
         # is re-stamped on update. A dedicated .ico sidesteps that extraction.
-        $iconIco = Join-Path $workDir 'resources\icon.ico'
+        $iconIco = Join-Path $workDir 'resources\sparklebot.ico'
         if (Test-Path $iconIco) {
             $iconLocation = "$iconIco,0"
         } else {

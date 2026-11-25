@@ -50,5 +50,6 @@ try {
     } finally { Pop-Location }
     $exe = Join-Path $repo 'apps\desktop\release\win-unpacked\Sparklebot.exe'
     if (-not (Test-Path -LiteralPath $exe)) { throw "Build finished but $exe is missing" }
+    Step 'Build checks' { node brand/check-build.mjs (Join-Path $repo 'apps\desktop\release\win-unpacked') }
     Write-Host "`nBuilt: $exe" -ForegroundColor Green
 } finally { Pop-Location }

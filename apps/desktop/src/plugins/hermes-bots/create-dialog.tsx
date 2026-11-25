@@ -330,7 +330,7 @@ export function CreateAgentDialog({ open, onClose, onConfigureModel, roster }: C
   const [description, setDescription] = useState('')
   // Default shapes mode: deterministic blob face drawn from the agent's name
   // (falls back to the legacy shape vocabulary on older SDKs).
-  const [shape, setShape] = useState(blobatarSvg ? 'blobatar' : 'circle')
+  const [shape, setShape] = useState('pebble')
   const [color, setColor] = useState<null | string>(null)
   const [image, setImage] = useState<null | string>(null)
   const [advanced, setAdvanced] = useState(false)
@@ -416,7 +416,7 @@ export function CreateAgentDialog({ open, onClose, onConfigureModel, roster }: C
     setName('')
     setTitle('')
     setDescription('')
-    setShape(blobatarSvg ? 'blobatar' : 'circle')
+    setShape('pebble')
     setColor(null)
     setImage(null)
     setAdvanced(false)

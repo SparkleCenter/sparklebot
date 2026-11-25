@@ -215,7 +215,7 @@ export function AvatarPicker({ shape, color, image, onShape, onColor, onImage, g
         ) : (
           <div className="grid justify-items-center gap-3">
             <div className="grid grid-cols-4 justify-items-center gap-1.5">
-              {(blobatarSvg ? ['blobatar', ...AVATAR_PICKER_SHAPES] : AVATAR_PICKER_SHAPES).map(s => (
+              {(blobatarSvg ? [...AVATAR_PICKER_SHAPES, 'blobatar'] : AVATAR_PICKER_SHAPES).map(s => (
                 <Tip key={s} label={s === 'blobatar' ? b.avatar.blobFromName : undefined}>
                   <RowButton
                     aria-label={s === 'blobatar' ? b.avatar.blobFromName : s}

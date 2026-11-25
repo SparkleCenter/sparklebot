@@ -134,7 +134,7 @@ module.exports = {
       : []),
     {
       from: 'assets/icon.ico',
-      to: 'icon.ico'
+      to: 'sparklebot.ico'
     }
   ],
   asar: {
